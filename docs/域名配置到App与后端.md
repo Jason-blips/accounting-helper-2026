@@ -24,17 +24,15 @@
 
 ### 1. 前端/App 用的环境变量
 
-在 **frontend** 目录下已有 **`.env.production`**，里面是一行：
+在 **frontend** 目录下已有 **`.env.production`**，当前已配置为：
 
 ```env
-VITE_API_URL=https://api.jiangluo.uk/api
+VITE_API_URL=https://app.jiangluo.uk/api
 ```
 
-- 把你的**实际 API 根地址**填进去，**必须以 `/api` 结尾**。
-- 若你用的是 **jiangluo.api.uk**（没有 api 子域名），且后端在根路径下提供 `/api`，则写成：
-  ```env
-  VITE_API_URL=https://jiangluo.api.uk/api
-  ```
+- 即前端/App 的服务器地址 **https://app.jiangluo.uk**，接口统一走 `/api`。详见 **`docs/配置app.jiangluo.uk.md`**。
+- 若 `.env.production` 尚未配置，请新建该文件并写入上面一行。
+- 若你改用单独 API 域名（如 `api.jiangluo.uk`），把上面改成 `https://api.jiangluo.uk/api` 即可。**必须以 `/api` 结尾**。
 - 必须用 **HTTPS**，不要用 `http://`。
 
 ### 2. 重新打 APK（让新地址进 App）
