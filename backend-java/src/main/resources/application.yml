@@ -21,7 +21,8 @@ spring:
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
-      ddl-auto: none  # 不自动管理schema，直接使用现有数据库
+      # 本地/已有库用 none；Render 等首次部署无库时可设环境变量 DDL_AUTO=update 自动建表
+      ddl-auto: ${DDL_AUTO:none}
     show-sql: false
     properties:
       hibernate:
