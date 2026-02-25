@@ -1,5 +1,7 @@
 # Counting Helper - 智能记账应用
 
+**About:** Lightweight expense tracking with multi-currency, billing cycles, and AI insights — one codebase for Web and Android.
+
 一个简单实用的记账应用，帮助你记录开销、分析消费，并通过AI提供省钱建议。
 
 ## ✨ 功能特性
