@@ -1,0 +1,38 @@
+# Node dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Vite cache
+.vite/
+
+# Build outputs
+frontend/dist/
+backend-java/target/
+
+# Android build (optional: remove if you want to track)
+frontend/android/app/build/
+frontend/android/build/
+frontend/android/.gradle/
+frontend/android/local.properties
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# SQLite runtime files (keep .db if you want; uncomment to ignore)
+# database/*.db
+# database/*.db-shm
+# database/*.db-wal
+

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员权限调试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .info-card .label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-card .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 管理员权限调试工具</h1>
+            <p>检查您的管理员权限状态</p>
+        </div>
+        <div class="content">
+            <!-- 步骤1: 检查LocalStorage -->
+            <div class="section">
+                <h2>1️⃣ 检查 LocalStorage（本地存储）</h2>
+                <div id="localStorageResult"></div>
+                <button onclick="checkLocalStorage()">🔍 检查 LocalStorage</button>
+            </div>
+
+            <!-- 步骤2: 检查API -->
+            <div class="section">
+                <h2>2️⃣ 检查 API 用户信息</h2>
+                <div id="apiResult"></div>
+                <button onclick="checkAPI()">🌐 检查 API</button>
+            </div>
+
+            <!-- 步骤3: 修复权限 -->
+            <div class="section">
+                <h2>3️⃣ 修复权限</h2>
+                <div id="fixResult"></div>
+                <button onclick="fixPermission()">🔧 重新获取权限</button>
+                <button class="btn-secondary" onclick="clearCache()">🗑️ 清除缓存</button>
+            </div>
+
+            <!-- 步骤4: 详细信息 -->
+            <div class="section">
+                <h2>4️⃣ 详细信息</h2>
+                <div id="detailResult"></div>
+                <button onclick="showDetails()">📊 显示详细信息</button>
+            </div>
+
+            <!-- 快速操作 -->
+            <div class="section">
+                <h2>⚡ 快速操作</h2>
+                <button onclick="goToAdmin()">👥 前往用户管理页面</button>
+                <button class="btn-secondary" onclick="goToDashboard()">🏠 前往Dashboard</button>
+                <button class="btn-danger" onclick="logout()">🚪 退出登录</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 检查LocalStorage
+        function checkLocalStorage() {
+            const resultDiv = document.getElementById('localStorageResult');
+            resultDiv.innerHTML = '<div class="loading"></div>检查中...';
+            
+            setTimeout(() => {
+                const token = localStorage.getItem('token');
+                const role = localStorage.getItem('userRole');
+                
+                let html = '<div class="info-grid">';
+                html += '<div class="info-card"><div class="label">Token</div><div class="value">' + (token ? '✅ 存在' : '❌ 不存在') + '</div></div>';
+                html += '<div class="info-card"><div class="label">用户角色</div><div class="value">' + (role || '❌ 未设置') + '</div></div>';
+                html += '</div>';
+                
+                if (token && role === 'admin') {
+                    html += '<div class="status success">✅ 您已被识别为管理员！应该能看到"用户管理"入口</div>';
+                } else if (token && role !== 'admin') {
+                    html += '<div class="status error">❌ 您未被识别为管理员。当前角色: ' + (role || 'null') + '</div>';
+                } else if (!token) {
+                    html += '<div class="status warning">⚠️ 未登录，请先登录</div>';
+                } else {
+                    html += '<div class="status warning">⚠️ 角色未设置，需要从API获取</div>';
+                }
+                
+                resultDiv.innerHTML = html;
+            }, 300);
+        }
+
+        // 检查API
+        async function checkAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div class="loading"></div>检查中...';
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                resultDiv.innerHTML = '<div class="status error">❌ 未登录，请先登录</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const user = await response.json();
+                
+                let html = '<div class="status success">✅ API 调用成功</div>';
+                html += '<pre>' + JSON.stringify(user, null, 2) + '</pre>';
+                
+                if (user.role === 'admin') {
+                    html += '<div class="status success">✅ 服务器确认您是管理员！</div>';
+                    html += '<div class="status info">💡 如果界面仍不显示"用户管理"，请点击"修复权限"按钮</div>';
+                } else {
+                    html += '<div class="status error">❌ 服务器显示您不是管理员</div>';
+                    html += '<div class="status warning">当前角色: ' + (user.role || 'null') + '</div>';
+                }
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="status error">❌ API 调用失败: ' + error.message + '</div>';
+            }
+        }
+
+        // 修复权限
+        async function fixPermission() {
+            const resultDiv = document.getElementById('fixResult');
+            resultDiv.innerHTML = '<div class="loading"></div>修复中...';
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                resultDiv.innerHTML = '<div class="status error">❌ 未登录，请先登录</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const user = await response.json();
+                
+                if (user.role) {
+                    localStorage.setItem('userRole', user.role);
+                    resultDiv.innerHTML = '<div class="status success">✅ 权限已更新！角色: ' + user.role + '</div>';
+                    resultDiv.innerHTML += '<div class="status info">💡 请刷新主页面（按F5）查看效果</div>';
+                    
+                    // 自动刷新检查
+                    setTimeout(() => {
+                        checkLocalStorage();
+                        checkAPI();
+                    }, 500);
+                } else {
+                    resultDiv.innerHTML = '<div class="status error">❌ 用户信息中没有角色字段</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="status error">❌ 修复失败: ' + error.message + '</div>';
+            }
+        }
+
+        // 清除缓存
+        function clearCache() {
+            if (confirm('确定要清除缓存吗？这将清除本地存储的角色信息，但不会清除登录状态。')) {
+                localStorage.removeItem('userRole');
+                document.getElementById('fixResult').innerHTML = '<div class="status success">✅ 缓存已清除</div>';
+                checkLocalStorage();
+            }
+        }
+
+        // 显示详细信息
+        function showDetails() {
+            const resultDiv = document.getElementById('detailResult');
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('userRole');
+            
+            const details = {
+                token: token ? token.substring(0, 20) + '...' : 'null',
+                tokenLength: token ? token.length : 0,
+                userRole: role || 'null',
+                timestamp: new Date().toLocaleString('zh-CN'),
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            };
+            
+            resultDiv.innerHTML = '<pre>' + JSON.stringify(details, null, 2) + '</pre>';
+        }
+
+        // 前往用户管理页面
+        function goToAdmin() {
+            window.location.href = '/admin';
+        }
+
+        // 前往Dashboard
+        function goToDashboard() {
+            window.location.href = '/';
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userRole');
+                window.location.href = '/login';
+            }
+        }
+
+        // 页面加载时自动检查
+        window.onload = function() {
+            checkLocalStorage();
+            setTimeout(() => {
+                checkAPI();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

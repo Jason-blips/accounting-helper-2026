@@ -1,0 +1,47 @@
+server:
+  port: 8000
+  # context-path removed so / serves frontend, /api serves API
+  error:
+    include-message: always
+    include-binding-errors: always
+  shutdown: graceful
+
+# 数据库路径：默认项目下 database/accounting.db；可覆盖为你的备份路径
+# 方式1：同目录下建 database 文件夹，放入 accounting.db
+# 方式2：启动时加参数 -Ddb.path=绝对路径/accounting.db  或 设置环境变量 DB_PATH
+db:
+  path: "${DB_PATH:${user.dir}/../database/accounting.db}"
+
+spring:
+  application:
+    name: counting-helper-backend
+  datasource:
+    url: jdbc:sqlite:${db.path}
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: none  # 不自动管理schema，直接使用现有数据库
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+        # 禁用schema验证，避免与现有数据库冲突
+        javax.persistence.schema-generation.database.action: none
+
+jwt:
+  secret: ${JWT_SECRET:counting-helper-secret-key-change-in-production}
+  expiration: 2592000000  # 30天（毫秒）
+
+openai:
+  api-key: ${OPENAI_API_KEY:}
+
+logging:
+  level:
+    root: INFO
+    com.countinghelper: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate: INFO
+    org.springframework.boot: INFO
