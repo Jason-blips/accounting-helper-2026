@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: ${PORT:8000}
   # context-path removed so / serves frontend, /api serves API
   error:
     include-message: always
