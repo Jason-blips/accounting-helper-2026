@@ -17,8 +17,8 @@ ENV DB_PATH=/app/data/accounting.db
 RUN mkdir -p /app/data
 
 COPY --from=builder /app/target/*.jar app.jar
-# 可选：镜像内种子库，entrypoint 首次启动时若 /app/data 上无库则从此复制
-COPY database/ /app/database/
+# 若需种子库：在 backend-java 下建 database/ 并放入 accounting.db，再取消下一行注释
+# COPY database/ /app/database/
 COPY entrypoint.sh /app/
 RUN chmod +x /app/entrypoint.sh
 
