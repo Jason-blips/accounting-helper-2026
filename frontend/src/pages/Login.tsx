@@ -43,7 +43,11 @@ export default function Login() {
       }
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || '操作失败，请重试');
+      const raw = err.response?.data?.error;
+      const safe = raw === '用户名已存在' || raw === '用户名或密码错误'
+        ? raw
+        : (isLogin ? '登录失败' : '注册失败');
+      setError(safe);
     } finally {
       setLoading(false);
     }

@@ -31,6 +31,15 @@ spring:
         # 禁用schema验证，避免与现有数据库冲突
         javax.persistence.schema-generation.database.action: none
 
+# 首次启动无用户时，是否创建默认管理员。默认 false：不自动创建，所有用户通过注册使用。
+# 若需要空库下有一个初始管理员，可设 INIT_ADMIN_ENABLED=true 并可选 INIT_ADMIN_USERNAME / INIT_ADMIN_PASSWORD
+app:
+  init:
+    admin:
+      enabled: ${INIT_ADMIN_ENABLED:false}
+      username: ${INIT_ADMIN_USERNAME:admin}
+      password: ${INIT_ADMIN_PASSWORD:admin123}
+
 jwt:
   secret: ${JWT_SECRET:counting-helper-secret-key-change-in-production}
   expiration: 2592000000  # 30天（毫秒）

@@ -28,11 +28,12 @@ Render 默认使用 **Node.js** 环境，没有 Java，所以直接跑 `./mvnw` 
 5. **Instance 端口**  
    - 应用已使用 `server.port=${PORT:8000}`，Render 注入的 **PORT** 会自动生效，无需再填 Start Command。
 
-6. **环境变量（重要）**  
-   - **DDL_AUTO=update**：首次部署或容器内没有现成数据库时必设。应用会按实体自动建表（如 `users`），并创建默认管理员 **admin / admin123**。不设则默认为 `none`，若没有库会报「no such table: users」。  
+6. **环境变量**  
+   - **DDL_AUTO=update**：首次部署或容器内没有现成数据库时必设，应用会按实体自动建表（如 `users`）。不设则默认为 `none`，若没有库会报「no such table: users」。  
+   - **默认不创建**任何初始管理员，所有用户通过**注册**使用。若你希望空库下有一个初始管理员，可额外设 `INIT_ADMIN_ENABLED=true` 及可选 `INIT_ADMIN_USERNAME` / `INIT_ADMIN_PASSWORD`。  
    - **DB_PATH**（可选）：数据库文件路径，默认容器内为 `/app/data/accounting.db`。若挂载了持久化磁盘，可设到该磁盘路径。
 
-7. 保存后 **Deploy**，等镜像构建并启动即可。首次启动后可用 admin / admin123 登录。
+7. 保存后 **Deploy**，等镜像构建并启动即可。用户需先注册再登录使用。
 
 ---
 

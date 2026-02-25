@@ -27,18 +27,22 @@ public class AuthController {
             AuthResponse response = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            // 仅返回对用户友好的文案，不暴露数据库等原始报错
+            String msg = "用户名已存在".equals(e.getMessage()) ? e.getMessage() : "注册失败";
+            return ResponseEntity.badRequest().body(Map.of("error", msg));
         }
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
+            // 仅返回对用户友好的文案，不暴露数据库等原始报错
+            String msg = "用户名或密码错误".equals(e.getMessage()) ? e.getMessage() : "登录失败";
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", e.getMessage()));
+                .body(Map.of("error", msg));
         }
     }
     

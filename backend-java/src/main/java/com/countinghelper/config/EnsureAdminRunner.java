@@ -1,51 +1,64 @@
 package com.countinghelper.config;
 
-import com.countinghelper.entity.User;
 import com.countinghelper.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 /**
- * 启动时若没有任何用户，则创建默认管理员 admin / admin123。
- * 用于 Render 等首次部署（DDL_AUTO=update 建表后库为空）或全新环境。
+ * 启动时若没有任何用户且启用了初始化，则创建默认管理员。
+ * 用户名与密码见 application.yml 的 app.init.admin，可通过环境变量覆盖。
+ * 使用 JdbcTemplate 插入，避免 SQLite JDBC 不支持 getGeneratedKeys() 导致启动失败。
  */
 @Component
 @Order(2)
 public class EnsureAdminRunner implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(EnsureAdminRunner.class);
-    private static final String ADMIN_USER = "admin";
-    private static final String ADMIN_PASS = "admin123";
+
+    @Value("${app.init.admin.enabled:false}")
+    private boolean enabled;
+
+    @Value("${app.init.admin.username:admin}")
+    private String initAdminUsername;
+
+    @Value("${app.init.admin.password:admin123}")
+    private String initAdminPassword;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
-    public EnsureAdminRunner(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public EnsureAdminRunner(UserRepository userRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void run(org.springframework.boot.ApplicationArguments args) {
+        if (!enabled) {
+            return;
+        }
         if (userRepository.count() > 0) {
             return;
         }
-        if (userRepository.existsByUsername(ADMIN_USER)) {
+        if (initAdminUsername == null || initAdminUsername.isBlank() || initAdminPassword == null || initAdminPassword.isBlank()) {
+            log.warn("[Init] Skipped creating default admin: username or password not set.");
             return;
         }
-        User admin = new User();
-        admin.setUsername(ADMIN_USER);
-        admin.setPassword(passwordEncoder.encode(ADMIN_PASS));
-        admin.setEmail("");
-        admin.setRole("admin");
-        admin.setCreatedAt(LocalDateTime.now());
-        userRepository.save(admin);
-        log.info("[Init] No users found. Created default admin (username: {}, password: {}). Change in production.", ADMIN_USER, ADMIN_PASS);
+        if (userRepository.existsByUsername(initAdminUsername)) {
+            return;
+        }
+        String hash = passwordEncoder.encode(initAdminPassword);
+        jdbcTemplate.update(
+            "INSERT INTO users (username, password, email, role, created_at) VALUES (?, ?, '', 'admin', datetime('now'))",
+            initAdminUsername, hash);
+        log.info("[Init] No users found. Created default admin (username: {}). Change password after first login.", initAdminUsername);
     }
 }
