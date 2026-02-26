@@ -227,7 +227,7 @@ export default function EditTransaction() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="input-field resize-none"
               rows={4}
-              placeholder="例如：在Leeds餐厅吃饭，和女朋友一起"
+              placeholder="例如：和朋友去Manchester餐厅吃饭，花费了50英镑"
             />
           </div>
 
