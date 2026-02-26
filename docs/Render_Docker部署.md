@@ -25,8 +25,9 @@ Render 默认使用 **Node.js** 环境，没有 Java，所以直接跑 `./mvnw` 
 4. **Build / Start**  
    - 选 Docker 后，Render 会用当前上下文里的 `Dockerfile` 执行 `docker build` 和 `docker run`，一般**不用再填 Build Command / Start Command**。
 
-5. **Instance 端口**  
-   - 应用已使用 `server.port=${PORT:8000}`，Render 注入的 **PORT** 会自动生效，无需再填 Start Command。
+5. **Instance 端口与「No open ports detected」**  
+   - 应用已使用 `server.port=${PORT:8000}` 且 `server.address=0.0.0.0`，Render 注入的 **PORT** 会自动生效。  
+   - Spring Boot 启动较慢（约 1～2 分钟），Render 在启动过程中可能先报 **No open ports detected, continuing to scan...**，属正常；等日志出现 **Tomcat started on port 10000**（或当前 PORT）和 **Your service is live** 即表示已就绪。**不要在中途点「Deploy cancelled」**，否则会中断部署。
 
 6. **环境变量**  
    - **DDL_AUTO=update**：首次部署或容器内没有现成数据库时必设，应用会按实体自动建表（如 `users`）。不设则默认为 `none`，若没有库会报「no such table: users」。  
@@ -41,4 +42,5 @@ Render 默认使用 **Node.js** 环境，没有 Java，所以直接跑 `./mvnw` 
 
 - **Root Directory** 是否指向包含 `Dockerfile` 和 `mvnw` 的目录（整仓库时填 `backend-java`）。  
 - Render 日志里是否还有权限错误：Dockerfile 里已 `chmod +x mvnw`，一般可避免 Permission denied。  
+- **not implemented by SQLite JDBC driver**：所有「插入并取自增 ID」的逻辑已改为 JdbcTemplate + `last_insert_rowid()`（注册、默认管理员、周期预算新建等），请确保已部署最新代码。  
 - 需要公网访问时，记得用 Render 提供的 HTTPS 地址（或自己的域名）作为前端的 API 地址（如 `VITE_API_URL`）。

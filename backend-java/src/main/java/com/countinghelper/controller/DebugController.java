@@ -24,10 +24,10 @@ public class DebugController {
     private TransactionRepository transactionRepository;
 
     private static Integer getUserId(Authentication auth) {
-        if (auth != null && auth.getPrincipal() != null) {
-            return (Integer) auth.getPrincipal();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new org.springframework.security.access.AccessDeniedException("未认证");
         }
-        return 1;
+        return (Integer) auth.getPrincipal();
     }
 
     @GetMapping("/transaction-info")

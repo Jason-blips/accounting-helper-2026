@@ -16,12 +16,12 @@ public class SettingsController {
     private BillingCycleService billingCycleService;
 
     private Integer getUserId(Authentication auth) {
-        if (auth != null && auth.getPrincipal() != null) {
-            Object p = auth.getPrincipal();
-            if (p instanceof Number) return ((Number) p).intValue();
-            if (p instanceof Integer) return (Integer) p;
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new org.springframework.security.access.AccessDeniedException("未认证");
         }
-        return 1;
+        Object p = auth.getPrincipal();
+        if (p instanceof Number) return ((Number) p).intValue();
+        return (Integer) p;
     }
 
     @GetMapping("/repayment-day")

@@ -4,6 +4,7 @@ import com.countinghelper.entity.Transaction;
 import com.countinghelper.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,10 +27,13 @@ public class SystemController {
         return ResponseEntity.ok(response);
     }
 
-    /** 调试：查看 user_id=1 的交易笔数及一条示例，用于排查「有总收支但列表为空」 */
+    /** 调试：查看当前登录用户的交易笔数及一条示例 */
     @GetMapping("/transaction-info")
-    public ResponseEntity<Map<String, Object>> transactionInfo() {
-        int userId = 1;
+    public ResponseEntity<Map<String, Object>> transactionInfo(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "未认证"));
+        }
+        int userId = (Integer) authentication.getPrincipal();
         List<Transaction> list = transactionRepository.findByUserIdOrderByCreatedAtDesc(userId);
         Map<String, Object> body = new HashMap<>();
         body.put("userId", userId);

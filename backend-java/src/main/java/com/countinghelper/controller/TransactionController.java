@@ -21,12 +21,11 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
     
-    // 辅助方法：安全获取userId，如果没有authentication则使用默认值1
     private Integer getUserId(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() != null) {
-            return (Integer) authentication.getPrincipal();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new org.springframework.security.access.AccessDeniedException("未认证");
         }
-        return 1; // 默认使用userId=1（manager用户）
+        return (Integer) authentication.getPrincipal();
     }
     
     @PostMapping

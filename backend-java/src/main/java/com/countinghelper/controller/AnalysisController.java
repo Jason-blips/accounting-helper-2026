@@ -19,15 +19,12 @@ public class AnalysisController {
     public ResponseEntity<AnalysisResponse> analyze(
             Authentication authentication,
             @RequestBody(required = false) AnalysisRequest request) {
-        Integer userId;
-        if (authentication != null && authentication.getPrincipal() != null) {
-            userId = (Integer) authentication.getPrincipal();
-        } else {
-            userId = 1; // 默认使用userId=1（manager用户）
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
         }
-        String period = (request != null && request.getPeriod() != null) 
+        Integer userId = (Integer) authentication.getPrincipal();
+        String period = (request != null && request.getPeriod() != null)
             ? request.getPeriod() : "all";
-        
         AnalysisResponse response = analysisService.analyze(userId, period);
         return ResponseEntity.ok(response);
     }

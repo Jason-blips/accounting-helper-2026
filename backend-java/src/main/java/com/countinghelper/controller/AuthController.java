@@ -48,13 +48,12 @@ public class AuthController {
     
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "TOKEN_MISSING"));
+        }
         try {
-            Integer userId;
-            if (authentication != null && authentication.getPrincipal() != null) {
-                userId = (Integer) authentication.getPrincipal();
-            } else {
-                userId = 1; // 默认使用userId=1（manager用户）
-            }
+            Integer userId = (Integer) authentication.getPrincipal();
             UserResponse user = authService.getCurrentUser(userId);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {

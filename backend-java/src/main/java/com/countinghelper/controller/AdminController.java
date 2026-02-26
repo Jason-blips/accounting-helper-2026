@@ -18,24 +18,21 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
     
-    // 辅助方法：安全获取userId，如果没有authentication则使用默认值1
     private Integer getUserId(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() != null) {
-            return (Integer) authentication.getPrincipal();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new org.springframework.security.access.AccessDeniedException("未认证");
         }
-        return 1; // 默认使用userId=1（manager用户，通常是admin）
+        return (Integer) authentication.getPrincipal();
     }
-    
+
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(Authentication authentication) {
         try {
-            // 暂时跳过管理员权限检查，允许所有请求
-            // Integer userId = getUserId(authentication);
-            // if (!adminService.isAdmin(userId)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "需要管理员权限"));
-            // }
-            
+            Integer userId = getUserId(authentication);
+            if (!adminService.isAdmin(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "需要管理员权限"));
+            }
             List<UserResponse> users = adminService.getAllUsers();
             return ResponseEntity.ok(users);
         } catch (Exception e) {
@@ -47,13 +44,11 @@ public class AdminController {
     @GetMapping("/stats")
     public ResponseEntity<?> getStats(Authentication authentication) {
         try {
-            // 暂时跳过管理员权限检查，允许所有请求
-            // Integer userId = getUserId(authentication);
-            // if (!adminService.isAdmin(userId)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "需要管理员权限"));
-            // }
-            
+            Integer userId = getUserId(authentication);
+            if (!adminService.isAdmin(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "需要管理员权限"));
+            }
             Map<String, Object> stats = adminService.getStats();
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
@@ -68,24 +63,21 @@ public class AdminController {
             @PathVariable Integer id) {
         try {
             Integer adminId = getUserId(authentication);
-            // 暂时跳过管理员权限检查，允许所有请求
-            // if (!adminService.isAdmin(adminId)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "需要管理员权限"));
-            // }
-            
+            if (!adminService.isAdmin(adminId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "需要管理员权限"));
+            }
             adminService.deleteUser(adminId, id);
             return ResponseEntity.ok(Map.of("message", "用户删除成功"));
         } catch (RuntimeException e) {
-            if (e.getMessage().equals("不能删除自己的账户")) {
-                return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            String msg = e.getMessage();
+            if ("不能删除自己的账户".equals(msg)) {
+                return ResponseEntity.badRequest().body(Map.of("error", msg));
             }
-            if (e.getMessage().equals("用户不存在")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+            if ("用户不存在".equals(msg)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", msg));
             }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "删除用户失败"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "删除用户失败"));
         }
     }
 }

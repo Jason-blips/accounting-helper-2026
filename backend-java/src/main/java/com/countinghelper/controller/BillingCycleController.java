@@ -17,10 +17,10 @@ public class BillingCycleController {
     private BillingCycleService billingCycleService;
 
     private Integer getUserId(Authentication auth) {
-        if (auth != null && auth.getPrincipal() != null) {
-            return (Integer) auth.getPrincipal();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new org.springframework.security.access.AccessDeniedException("未认证");
         }
-        return 1;
+        return (Integer) auth.getPrincipal();
     }
 
     /** List cycles with stats (and budget if set). from/to in YYYY-MM-DD. */

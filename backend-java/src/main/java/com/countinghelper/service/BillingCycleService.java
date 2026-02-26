@@ -216,17 +216,21 @@ public class BillingCycleService {
         return budgetRepository.findByUserIdAndCycleStart(userId, cycleStart);
     }
 
+    /**
+     * 已有记录则 UPDATE；新记录用 JdbcTemplate INSERT，避免 SQLite getGeneratedKeys 导致失败。
+     */
     @Transactional
     public void setBudget(Integer userId, String cycleStart, Double expectedIncome, Double expectedExpense) {
-        BillingCycleBudget b = budgetRepository.findByUserIdAndCycleStart(userId, cycleStart)
-            .orElseGet(() -> {
-                BillingCycleBudget x = new BillingCycleBudget();
-                x.setUserId(userId);
-                x.setCycleStart(cycleStart);
-                return x;
-            });
-        b.setExpectedIncome(expectedIncome);
-        b.setExpectedExpense(expectedExpense);
-        budgetRepository.save(b);
+        Optional<BillingCycleBudget> existing = budgetRepository.findByUserIdAndCycleStart(userId, cycleStart);
+        if (existing.isPresent()) {
+            BillingCycleBudget b = existing.get();
+            b.setExpectedIncome(expectedIncome);
+            b.setExpectedExpense(expectedExpense);
+            budgetRepository.save(b);
+        } else {
+            jdbcTemplate.update(
+                "INSERT INTO billing_cycle_budget (user_id, cycle_start, expected_income, expected_expense) VALUES (?, ?, ?, ?)",
+                userId, cycleStart, expectedIncome, expectedExpense);
+        }
     }
 }
