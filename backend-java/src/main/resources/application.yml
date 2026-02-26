@@ -16,11 +16,15 @@ db:
 spring:
   application:
     name: counting-helper-backend
+  # 延迟初始化：启动时少创建 Bean，首请求略慢、整体部署明显加快（适合 Render 等）
+  main:
+    lazy-initialization: ${LAZY_INIT:true}
   datasource:
     url: jdbc:sqlite:${db.path}
     driver-class-name: org.sqlite.JDBC
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
+    open-in-view: false
     hibernate:
       # 本地/已有库用 none；Render 等首次部署无库时可设环境变量 DDL_AUTO=update 自动建表
       ddl-auto: ${DDL_AUTO:none}

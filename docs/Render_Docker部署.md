@@ -27,12 +27,13 @@ Render 默认使用 **Node.js** 环境，没有 Java，所以直接跑 `./mvnw` 
 
 5. **Instance 端口与「No open ports detected」**  
    - 应用已使用 `server.port=${PORT:8000}` 且 `server.address=0.0.0.0`，Render 注入的 **PORT** 会自动生效。  
-   - Spring Boot 启动较慢（约 1～2 分钟），Render 在启动过程中可能先报 **No open ports detected, continuing to scan...**，属正常；等日志出现 **Tomcat started on port 10000**（或当前 PORT）和 **Your service is live** 即表示已就绪。**不要在中途点「Deploy cancelled」**，否则会中断部署。
+   - 已做**启动加速**（延迟初始化 + JVM 参数），启动时间会缩短；Render 在启动过程中仍可能报 **No open ports detected, continuing to scan...**，属正常。等日志出现 **Tomcat started on port 10000**（或当前 PORT）和 **Your service is live** 即表示已就绪。**不要在中途点「Deploy cancelled」**，否则会中断部署。
 
 6. **环境变量**  
    - **DDL_AUTO=update**：首次部署或容器内没有现成数据库时必设，应用会按实体自动建表（如 `users`）。不设则默认为 `none`，若没有库会报「no such table: users」。  
    - **默认不创建**任何初始管理员，所有用户通过**注册**使用。若你希望空库下有一个初始管理员，可额外设 `INIT_ADMIN_ENABLED=true` 及可选 `INIT_ADMIN_USERNAME` / `INIT_ADMIN_PASSWORD`。  
-   - **DB_PATH**（可选）：数据库文件路径，默认容器内为 `/app/data/accounting.db`。**若希望重新部署后账号不丢失，必须使用持久化盘（见下方）。**
+   - **DB_PATH**（可选）：数据库文件路径，默认容器内为 `/app/data/accounting.db`。**若希望重新部署后账号不丢失，必须使用持久化盘（见下方）。**  
+   - **启动加速**（可选）：应用已默认开启延迟初始化与 JVM 启动优化，部署会更快。若需关闭延迟初始化可设 `LAZY_INIT=false`；自定义 JVM 参数可设 `JAVA_OPTS`（默认含 `-XX:TieredStopAtLevel=1`）。
 
 7. **数据持久化（重新部署后账号不丢失）**  
    - Render 每次重新部署会重建容器，容器内 `/app/data/` 会清空，导致**之前注册的账号丢失**。  

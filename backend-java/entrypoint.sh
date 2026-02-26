@@ -6,4 +6,7 @@ mkdir -p "$(dirname "$DB_FILE")"
 if [ ! -f "$DB_FILE" ] && [ -f /app/database/accounting.db ]; then
   cp /app/database/accounting.db "$DB_FILE"
 fi
-exec java -jar /app/app.jar
+# 可选 JVM 参数：加快启动（Render 等）；可通过环境变量 JAVA_OPTS 覆盖
+# TieredStopAtLevel=1 仅用 C1 编译，启动快、首请求略慢
+JAVA_OPTS="${JAVA_OPTS:--XX:TieredStopAtLevel=1}"
+exec java $JAVA_OPTS -jar /app/app.jar
