@@ -185,7 +185,15 @@ export const transactionApi = {
   getPaged: async (
     page: number,
     size: number,
-    opts?: { date?: string; from?: string; to?: string }
+    opts?: {
+      date?: string;
+      from?: string;
+      to?: string;
+      type?: string;
+      paymentMethod?: string;
+      category?: string;
+      keyword?: string;
+    }
   ): Promise<TransactionPage> => {
     const params: Record<string, string | number> = { page, size };
     if (opts?.from && opts?.to) {
@@ -194,6 +202,10 @@ export const transactionApi = {
     } else if (opts?.date) {
       params.date = opts.date;
     }
+    if (opts?.type) params.type = opts.type;
+    if (opts?.paymentMethod) params.paymentMethod = opts.paymentMethod;
+    if (opts?.category) params.category = opts.category;
+    if (opts?.keyword?.trim()) params.keyword = opts.keyword.trim();
     const response = await api.get('/transactions/paged', { params });
     const data = response.data;
     if (data?.silent || data?.isTokenExpired) return data;

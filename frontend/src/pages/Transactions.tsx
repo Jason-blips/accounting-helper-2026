@@ -23,10 +23,14 @@ export default function Transactions() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [filterDate, setFilterDate] = useState('');
+  const [filterType, setFilterType] = useState<string>('');
+  const [filterPayment, setFilterPayment] = useState<string>('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterKeyword, setFilterKeyword] = useState('');
 
   useEffect(() => {
     loadTransactions();
-  }, [currentPage, filterDate, urlFrom, urlTo]);
+  }, [currentPage, filterDate, urlFrom, urlTo, filterType, filterPayment]);
 
   const goToPage = (page: number) => {
     setSearchParams((prev) => {
@@ -48,13 +52,26 @@ export default function Transactions() {
   const loadTransactions = async () => {
     setLoading(true);
     try {
-      const opts =
-        urlFrom && urlTo
-          ? { from: urlFrom, to: urlTo }
-          : filterDate
-            ? { date: filterDate }
-            : undefined;
-      const result = await transactionApi.getPaged(currentPage - 1, PAGE_SIZE, opts);
+      const opts: {
+        date?: string;
+        from?: string;
+        to?: string;
+        type?: string;
+        paymentMethod?: string;
+        category?: string;
+        keyword?: string;
+      } = {};
+      if (urlFrom && urlTo) {
+        opts.from = urlFrom;
+        opts.to = urlTo;
+      } else if (filterDate) {
+        opts.date = filterDate;
+      }
+      if (filterType) opts.type = filterType;
+      if (filterPayment) opts.paymentMethod = filterPayment;
+      if (filterCategory.trim()) opts.category = filterCategory.trim();
+      if (filterKeyword.trim()) opts.keyword = filterKeyword.trim();
+      const result = await transactionApi.getPaged(currentPage - 1, PAGE_SIZE, Object.keys(opts).length ? opts : undefined);
       if ((result as { silent?: boolean; isTokenExpired?: boolean })?.silent || (result as { isTokenExpired?: boolean })?.isTokenExpired) {
         return;
       }
@@ -213,6 +230,77 @@ export default function Transactions() {
                   )}
                 </>
               )}
+            </div>
+          </div>
+        </div>
+
+        <div className="card p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-gray-700">类型 / 支付 / 分类 / 关键词</span>
+            {(filterType || filterPayment || filterCategory.trim() || filterKeyword.trim()) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFilterType('');
+                  setFilterPayment('');
+                  setFilterCategory('');
+                  setFilterKeyword('');
+                  onFilterChange();
+                }}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                清除筛选
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">类型</label>
+              <select
+                value={filterType}
+                onChange={(e) => { setFilterType(e.target.value); onFilterChange(); }}
+                className="input-field w-full min-h-[40px] text-sm"
+              >
+                <option value="">全部</option>
+                <option value="收入">收入</option>
+                <option value="支出">支出</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">支付方式</label>
+              <select
+                value={filterPayment}
+                onChange={(e) => { setFilterPayment(e.target.value); onFilterChange(); }}
+                className="input-field w-full min-h-[40px] text-sm"
+              >
+                <option value="">全部</option>
+                <option value="银行卡转账">银行卡转账</option>
+                <option value="现金">现金</option>
+                <option value="微信支付">微信支付</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">分类（精确）</label>
+              <input
+                type="text"
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                onBlur={() => { onFilterChange(); loadTransactions(); }}
+                placeholder="如：餐饮"
+                className="input-field w-full min-h-[40px] text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">关键词（描述/分类）</label>
+              <input
+                type="text"
+                value={filterKeyword}
+                onChange={(e) => setFilterKeyword(e.target.value)}
+                onBlur={() => { onFilterChange(); loadTransactions(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { onFilterChange(); loadTransactions(); } }}
+                placeholder="搜索描述或分类"
+                className="input-field w-full min-h-[40px] text-sm"
+              />
             </div>
           </div>
         </div>

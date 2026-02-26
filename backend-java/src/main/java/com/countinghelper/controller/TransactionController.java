@@ -72,10 +72,15 @@ public class TransactionController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String from,
-            @RequestParam(required = false) String to) {
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String paymentMethod,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword) {
         try {
             Integer userId = getUserId(authentication);
-            Page<Transaction> result = transactionService.getTransactionsPaged(userId, page, size, date, from, to);
+            Page<Transaction> result = transactionService.getTransactionsPaged(
+                userId, page, size, date, from, to, type, paymentMethod, category, keyword);
             Map<String, Object> body = new HashMap<>();
             body.put("content", result.getContent());
             body.put("totalElements", result.getTotalElements());

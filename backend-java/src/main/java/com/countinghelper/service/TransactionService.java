@@ -4,17 +4,23 @@ import com.countinghelper.dto.request.TransactionRequest;
 import com.countinghelper.dto.response.StatsResponse;
 import com.countinghelper.entity.Transaction;
 import com.countinghelper.repository.TransactionRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,27 +127,55 @@ public class TransactionService {
         }
     }
 
-    /** 分页查询：支持 date 或 from/to，无筛选时按全部倒序 */
-    public Page<Transaction> getTransactionsPaged(Integer userId, int page, int size, String date, String from, String to) {
+    /** 分页查询：支持 date/from/to、type、paymentMethod、category、keyword 筛选 */
+    public Page<Transaction> getTransactionsPaged(
+            Integer userId, int page, int size,
+            String date, String from, String to,
+            String transactionType, String paymentMethod, String category, String keyword) {
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(100, Math.max(1, size)), Sort.by(Sort.Direction.DESC, "createdAt"));
-        if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
-            try {
-                LocalDateTime start = LocalDateTime.parse(from + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                LocalDateTime end = LocalDateTime.parse(to + "T23:59:59", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                return transactionRepository.findByUserIdAndCreatedAtBetween(userId, start, end, pageable);
-            } catch (Exception e) {
-                return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        Specification<Transaction> spec = buildListSpec(userId, date, from, to, transactionType, paymentMethod, category, keyword);
+        return transactionRepository.findAll(spec, pageable);
+    }
+
+    private Specification<Transaction> buildListSpec(
+            Integer userId, String date, String from, String to,
+            String transactionType, String paymentMethod, String category, String keyword) {
+        return (Root<Transaction> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            List<Predicate> preds = new ArrayList<>();
+            preds.add(cb.equal(root.get("userId"), userId));
+
+            if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
+                try {
+                    LocalDateTime start = LocalDateTime.parse(from + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    LocalDateTime end = LocalDateTime.parse(to + "T23:59:59", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    preds.add(cb.between(root.get("createdAt"), start, end));
+                } catch (Exception ignored) { }
+            } else if (date != null && !date.isEmpty()) {
+                try {
+                    LocalDateTime start = LocalDateTime.parse(date + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    LocalDateTime end = LocalDateTime.parse(date + "T23:59:59", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    preds.add(cb.between(root.get("createdAt"), start, end));
+                } catch (Exception ignored) { }
             }
-        }
-        if (date != null && !date.isEmpty()) {
-            try {
-                LocalDateTime.parse(date + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                return transactionRepository.findByUserIdAndDatePaged(userId, date, pageable);
-            } catch (Exception e) {
-                return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+
+            if (transactionType != null && !transactionType.isEmpty()) {
+                preds.add(cb.equal(root.get("transactionType"), transactionType));
             }
-        }
-        return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+            if (paymentMethod != null && !paymentMethod.isEmpty()) {
+                preds.add(cb.equal(root.get("paymentMethod"), paymentMethod));
+            }
+            if (category != null && !category.isEmpty()) {
+                preds.add(cb.equal(root.get("category"), category));
+            }
+            if (keyword != null && !keyword.isEmpty()) {
+                String pattern = "%" + keyword.trim().toLowerCase() + "%";
+                preds.add(cb.or(
+                    cb.like(cb.lower(cb.coalesce(root.get("description"), "")), pattern),
+                    cb.like(cb.lower(cb.coalesce(root.get("category"), "")), pattern)
+                ));
+            }
+            return cb.and(preds.toArray(new Predicate[0]));
+        };
     }
     
     @Transactional
