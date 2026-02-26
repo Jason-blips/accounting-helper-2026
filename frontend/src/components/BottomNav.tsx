@@ -12,8 +12,12 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t safe-bottom"
-      style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t safe-bottom rounded-t-[1.5rem] backdrop-blur-xl"
+      style={{
+        backgroundColor: 'color-mix(in srgb, var(--theme-surface) 90%, transparent)',
+        borderColor: 'var(--theme-border)',
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
+      }}
       aria-label="主导航"
     >
       <div className="flex justify-around items-center h-16">

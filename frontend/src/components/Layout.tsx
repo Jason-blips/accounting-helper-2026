@@ -109,7 +109,7 @@ export default function Layout({ children }: LayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 app-shell">
+    <div className="min-h-screen app-shell">
       <a
         href="#main-content"
         className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:w-auto focus:h-auto focus:m-0 focus:overflow-visible focus:[clip:auto]"
@@ -118,8 +118,12 @@ export default function Layout({ children }: LayoutProps) {
         跳过导航，进入主内容
       </a>
       <nav
-        className="backdrop-blur-lg shadow-sm border-b sticky top-0 z-50 safe-top"
-        style={{ backgroundColor: 'color-mix(in srgb, var(--theme-nav-bg) 95%, transparent)', borderColor: 'var(--theme-border)' }}
+        className="backdrop-blur-xl border-b sticky top-0 z-50 safe-top"
+        style={{
+          backgroundColor: 'color-mix(in srgb, var(--theme-nav-bg) 88%, transparent)',
+          borderColor: 'var(--theme-border)',
+          boxShadow: 'var(--shadow-nav)',
+        }}
         aria-label="主导航"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -288,7 +292,7 @@ export default function Layout({ children }: LayoutProps) {
         </>
       )}
 
-      <main id="main-content" className="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-8 safe-bottom" tabIndex={-1}>
+      <main id="main-content" className="page-content max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-8 safe-bottom" tabIndex={-1}>
         {children}
       </main>
       <BottomNav />
