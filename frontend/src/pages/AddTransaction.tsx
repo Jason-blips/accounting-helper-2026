@@ -6,9 +6,24 @@ import { transactionApi, settingsApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import { getTodayInTimezone } from '../utils/format';
 
+/** 移动端（宽度 < 768px）时用于折叠可选字段 */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia('(max-width: 767px)');
+    setIsMobile(m.matches);
+    const listener = () => setIsMobile(m.matches);
+    m.addEventListener('change', listener);
+    return () => m.removeEventListener('change', listener);
+  }, []);
+  return isMobile;
+}
+
 export default function AddTransaction() {
   const navigate = useNavigate();
   const toast = useToast();
+  const isMobile = useIsMobile();
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [formData, setFormData] = useState({
     amount: '',
     currency: 'GBP',
@@ -79,7 +94,7 @@ export default function AddTransaction() {
             <select
               value={formData.transaction_type}
               onChange={(e) => setFormData({ ...formData, transaction_type: e.target.value as '收入' | '支出' })}
-              className="input-field"
+              className="input-field min-h-[48px]"
               required
             >
               <option value="收入">收入</option>
@@ -115,7 +130,7 @@ export default function AddTransaction() {
               <select
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="input-field"
+                className="input-field min-h-[48px]"
                 required
               >
                 <option value="GBP">GBP (£)</option>
@@ -152,7 +167,7 @@ export default function AddTransaction() {
             <select
               value={formData.payment_method}
               onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-              className="input-field"
+              className="input-field min-h-[48px]"
               required
             >
               <option value="银行卡转账">银行卡转账</option>
@@ -161,27 +176,76 @@ export default function AddTransaction() {
             </select>
           </div>
 
-          <div>
-            <label className="label">分类</label>
-            <input
-              type="text"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="input-field"
-              placeholder="例如：餐饮、交通、购物"
-            />
-          </div>
-
-          <div>
-            <label className="label">描述</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="input-field resize-none"
-              rows={4}
-              placeholder="例如：和朋友去Manchester餐厅吃饭，花费了50英镑"
-            />
-          </div>
+          {/* 移动端：可选字段折叠为「更多选项」，减少首屏步骤 */}
+          {isMobile ? (
+            <>
+              {!showMoreOptions ? (
+                <button
+                  type="button"
+                  onClick={() => setShowMoreOptions(true)}
+                  className="w-full py-3 text-sm font-medium text-blue-600 border border-dashed border-blue-200 rounded-xl hover:bg-blue-50 transition-colors touch-target"
+                >
+                  + 添加分类与描述（可选）
+                </button>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">分类与描述</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreOptions(false)}
+                      className="text-sm text-gray-500 hover:text-gray-700 touch-target"
+                    >
+                      收起
+                    </button>
+                  </div>
+                  <div>
+                    <label className="label">分类</label>
+                    <input
+                      type="text"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="input-field min-h-[48px]"
+                      placeholder="例如：餐饮、交通、购物"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">描述</label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="input-field resize-none min-h-[80px]"
+                      rows={3}
+                      placeholder="例如：和朋友去Manchester餐厅吃饭"
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="label">分类</label>
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="input-field"
+                  placeholder="例如：餐饮、交通、购物"
+                />
+              </div>
+              <div>
+                <label className="label">描述</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="input-field resize-none"
+                  rows={4}
+                  placeholder="例如：和朋友去Manchester餐厅吃饭，花费了50英镑"
+                />
+              </div>
+            </>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
