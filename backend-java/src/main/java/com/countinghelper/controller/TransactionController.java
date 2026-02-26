@@ -3,15 +3,20 @@ package com.countinghelper.controller;
 import com.countinghelper.dto.request.TransactionRequest;
 import com.countinghelper.dto.response.StatsResponse;
 import com.countinghelper.entity.Transaction;
+import com.countinghelper.service.TransactionExportService;
 import com.countinghelper.service.TransactionService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,9 @@ public class TransactionController {
     
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private TransactionExportService transactionExportService;
     
     private Integer getUserId(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -149,6 +157,44 @@ public class TransactionController {
         }
     }
     
+    /** 导出交易：format=csv|excel，from/to 可选日期范围（YYYY-MM-DD），不传则导出全部 */
+    @GetMapping("/export")
+    public ResponseEntity<?> exportTransactions(
+            Authentication authentication,
+            @RequestParam(defaultValue = "csv") String format,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to) {
+        try {
+            Integer userId = getUserId(authentication);
+            List<Transaction> list;
+            if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
+                list = transactionService.getTransactionsInRange(userId, from, to);
+            } else {
+                list = transactionService.getTransactions(userId, null);
+            }
+            byte[] bytes;
+            String filename;
+            String contentType;
+            if ("excel".equalsIgnoreCase(format)) {
+                bytes = transactionExportService.exportToExcel(list);
+                filename = "transactions.xlsx";
+                contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            } else {
+                bytes = transactionExportService.exportToCsv(list);
+                filename = "transactions.csv";
+                contentType = "text/csv; charset=UTF-8";
+            }
+            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"; filename*=UTF-8''" + encodedFilename);
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "导出失败：" + e.getMessage()));
+        }
+    }
+
     @GetMapping("/stats/summary")
     public ResponseEntity<?> getStats(Authentication authentication) {
         try {

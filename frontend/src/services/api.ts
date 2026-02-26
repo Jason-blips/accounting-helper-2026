@@ -232,6 +232,33 @@ export const transactionApi = {
     const response = await api.delete(`/transactions/${id}`);
     return response.data;
   },
+  /** 导出交易为 CSV 或 Excel，可选日期范围；成功后触发浏览器下载 */
+  export: async (format: 'csv' | 'excel', from?: string, to?: string): Promise<void> => {
+    const params: Record<string, string> = { format: format === 'excel' ? 'excel' : 'csv' };
+    if (from) params.from = from;
+    if (to) params.to = to;
+    const response = await api.get('/transactions/export', { params, responseType: 'blob' });
+    const blob = response.data as Blob;
+    const contentType = response.headers['content-type'] || '';
+    if (response.status !== 200 || (contentType && contentType.includes('application/json'))) {
+      const text = await blob.text();
+      let msg = '导出失败';
+      try {
+        const json = JSON.parse(text);
+        if (json?.error) msg = json.error;
+      } catch {
+        if (text) msg = text;
+      }
+      throw new Error(msg);
+    }
+    const filename = format === 'excel' ? 'transactions.xlsx' : 'transactions.csv';
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
 };
 
 export const statsApi = {
