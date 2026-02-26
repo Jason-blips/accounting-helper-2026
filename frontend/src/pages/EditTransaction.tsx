@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ErrorBanner from '../components/ErrorBanner';
-import { transactionApi } from '../services/api';
+import { transactionApi, categoriesApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
-import type { Transaction } from '../types';
+import type { Transaction, UserCategory } from '../types';
 
 export default function EditTransaction() {
   const { id } = useParams<{ id: string }>();
@@ -23,10 +23,18 @@ export default function EditTransaction() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState<UserCategory[]>([]);
+  const CATEGORY_OTHER = '__other__';
+  const categorySelectValue = formData.category && categories.some((c) => c.name === formData.category)
+    ? formData.category
+    : CATEGORY_OTHER;
 
   useEffect(() => {
     loadTransaction();
   }, [id]);
+  useEffect(() => {
+    categoriesApi.list().then(setCategories).catch(() => setCategories([]));
+  }, []);
 
   const loadTransaction = async () => {
     const numId = parseInt(id || '0', 10);
@@ -222,14 +230,30 @@ export default function EditTransaction() {
 
           <div>
             <label className="label" htmlFor="edit-category">分类</label>
-            <input
+            <select
               id="edit-category"
-              type="text"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              value={categorySelectValue}
+              onChange={(e) => {
+                const v = e.target.value;
+                setFormData({ ...formData, category: v === CATEGORY_OTHER ? '' : v });
+              }}
               className="input-field"
-              placeholder="例如：餐饮、交通、购物"
-            />
+            >
+              <option value="">不选</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.name}>{c.name}</option>
+              ))}
+              <option value={CATEGORY_OTHER}>其他（手动输入）</option>
+            </select>
+            {categorySelectValue === CATEGORY_OTHER && (
+              <input
+                type="text"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="input-field mt-2"
+                placeholder="输入分类"
+              />
+            )}
           </div>
 
           <div>

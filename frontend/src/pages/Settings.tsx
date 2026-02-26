@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
-import { settingsApi, transactionApi } from '../services/api';
+import { settingsApi, transactionApi, categoriesApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import { useTheme } from '../contexts/ThemeContext';
+import type { UserCategory } from '../types';
 
 const TIMEZONE_OPTIONS: { value: string; label: string }[] = [
   { value: 'Europe/London', label: '英国时间' },
@@ -19,18 +20,28 @@ export default function Settings() {
   const [exportFrom, setExportFrom] = useState('');
   const [exportTo, setExportTo] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ imported: number; failed: number; errors: string[] } | null>(null);
+  const [categories, setCategories] = useState<UserCategory[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+  const [editingCategoryName, setEditingCategoryName] = useState('');
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [dayRes, tzRes] = await Promise.all([
+        const [dayRes, tzRes, cats] = await Promise.all([
           settingsApi.getRepaymentDay(),
           settingsApi.getTimezone(),
+          categoriesApi.list().catch(() => []),
         ]);
         if (!cancelled) {
           setRepaymentDay(dayRes.repaymentDay);
           setTimezone(tzRes.timezone || 'Europe/London');
+          setCategories(Array.isArray(cats) ? cats : []);
         }
       } catch (e) {
         console.error(e);
@@ -82,6 +93,66 @@ export default function Settings() {
     } finally {
       setImporting(false);
       setImportFile(null);
+    }
+  };
+
+  const handleAddCategory = async () => {
+    const name = newCategoryName.trim();
+    if (!name) {
+      toast('请输入分类名称');
+      return;
+    }
+    setAddingCategory(true);
+    try {
+      const created = await categoriesApi.create(name);
+      setCategories((prev) => [...prev, created].sort((a, b) => a.displayOrder - b.displayOrder));
+      setNewCategoryName('');
+      toast('已添加');
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { error?: string } } };
+      toast(err.response?.data?.error || '添加失败');
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
+  const handleStartEditCategory = (c: UserCategory) => {
+    setEditingCategoryId(c.id);
+    setEditingCategoryName(c.name);
+  };
+
+  const handleSaveEditCategory = async () => {
+    if (editingCategoryId == null) return;
+    const name = editingCategoryName.trim();
+    if (!name) {
+      toast('分类名称不能为空');
+      return;
+    }
+    try {
+      const updated = await categoriesApi.update(editingCategoryId, name);
+      setCategories((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+      setEditingCategoryId(null);
+      setEditingCategoryName('');
+      toast('已保存');
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { error?: string } } };
+      toast(err.response?.data?.error || '保存失败');
+    }
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    if (!window.confirm('确定删除该分类？已有交易中的该分类将保留为文字，不会丢失。')) return;
+    try {
+      await categoriesApi.delete(id);
+      setCategories((prev) => prev.filter((x) => x.id !== id));
+      if (editingCategoryId === id) {
+        setEditingCategoryId(null);
+        setEditingCategoryName('');
+      }
+      toast('已删除');
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { error?: string } } };
+      toast(err.response?.data?.error || '删除失败');
     }
   };
 
@@ -159,6 +230,66 @@ export default function Settings() {
                     )}
                   </button>
                 ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
+                <svg className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                分类管理
+              </h2>
+              <p className="text-sm mb-3" style={{ color: 'var(--theme-text-muted)' }}>自定义分类后，在「记一笔」中可从下拉选择</p>
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                    className="input-field max-w-[200px]"
+                    placeholder="新分类名称"
+                    aria-label="新分类名称"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCategory}
+                    disabled={addingCategory || !newCategoryName.trim()}
+                    className="btn-primary"
+                  >
+                    {addingCategory ? '添加中...' : '添加'}
+                  </button>
+                </div>
+                <ul className="space-y-2">
+                  {categories.map((c) => (
+                    <li key={c.id} className="flex items-center gap-2 flex-wrap">
+                      {editingCategoryId === c.id ? (
+                        <>
+                          <input
+                            type="text"
+                            value={editingCategoryName}
+                            onChange={(e) => setEditingCategoryName(e.target.value)}
+                            className="input-field max-w-[180px]"
+                            autoFocus
+                            aria-label="编辑分类名称"
+                          />
+                          <button type="button" onClick={handleSaveEditCategory} className="btn-secondary text-sm">保存</button>
+                          <button type="button" onClick={() => { setEditingCategoryId(null); setEditingCategoryName(''); }} className="btn-secondary text-sm">取消</button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="font-medium" style={{ color: 'var(--theme-text)' }}>{c.name}</span>
+                          <button type="button" onClick={() => handleStartEditCategory(c)} className="text-sm" style={{ color: 'var(--theme-primary)' }}>编辑</button>
+                          <button type="button" onClick={() => handleDeleteCategory(c.id)} className="text-sm text-red-600" aria-label={`删除分类 ${c.name}`}>删除</button>
+                        </>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                {categories.length === 0 && (
+                  <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>暂无自定义分类，添加后记账时可从下拉选择</p>
+                )}
               </div>
             </section>
 

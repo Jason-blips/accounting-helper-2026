@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken, removeToken, setUserRole } from './auth';
-import type { User, Transaction, Stats, AnalysisResponse, BillingCycleDto, TransactionPage } from '../types';
+import type { User, Transaction, Stats, AnalysisResponse, BillingCycleDto, TransactionPage, UserCategory } from '../types';
 
 // In app build (Capacitor), use VITE_API_URL (e.g. https://your-api.com/api). In dev/web, default is /api (proxy).
 const api = axios.create({
@@ -308,6 +308,42 @@ export const adminApi = {
   deleteUser: async (userId: number) => {
     const response = await api.delete(`/admin/users/${userId}`);
     return response.data;
+  },
+};
+
+export const categoriesApi = {
+  list: async (): Promise<UserCategory[]> => {
+    const response = await api.get('/categories');
+    const raw = response.data as unknown[];
+    return (raw ?? []).map((c: Record<string, unknown>) => ({
+      id: c.id as number,
+      userId: c.userId as number,
+      name: (c.name as string) ?? '',
+      displayOrder: (c.displayOrder as number) ?? 0,
+    }));
+  },
+  create: async (name: string): Promise<UserCategory> => {
+    const response = await api.post('/categories', { name });
+    const c = response.data as Record<string, unknown>;
+    return {
+      id: c.id as number,
+      userId: c.userId as number,
+      name: (c.name as string) ?? '',
+      displayOrder: (c.displayOrder as number) ?? 0,
+    };
+  },
+  update: async (id: number, name: string): Promise<UserCategory> => {
+    const response = await api.put(`/categories/${id}`, { name });
+    const c = response.data as Record<string, unknown>;
+    return {
+      id: c.id as number,
+      userId: c.userId as number,
+      name: (c.name as string) ?? '',
+      displayOrder: (c.displayOrder as number) ?? 0,
+    };
+  },
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/categories/${id}`);
   },
 };
 

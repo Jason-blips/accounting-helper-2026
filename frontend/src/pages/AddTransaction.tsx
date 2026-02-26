@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ErrorBanner from '../components/ErrorBanner';
-import { transactionApi, settingsApi } from '../services/api';
+import { transactionApi, settingsApi, categoriesApi } from '../services/api';
+import type { UserCategory } from '../types';
 import { useToast } from '../contexts/ToastContext';
 import { getTodayInTimezone } from '../utils/format';
 
@@ -43,8 +44,16 @@ export default function AddTransaction() {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
+  useEffect(() => {
+    categoriesApi.list().then(setCategories).catch(() => setCategories([]));
+  }, []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState<UserCategory[]>([]);
+  const CATEGORY_OTHER = '__other__';
+  const categorySelectValue = formData.category && categories.some((c) => c.name === formData.category)
+    ? formData.category
+    : CATEGORY_OTHER;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,14 +216,30 @@ export default function AddTransaction() {
                   </div>
                   <div>
                     <label className="label" htmlFor="add-category-mobile">分类</label>
-                    <input
+                    <select
                       id="add-category-mobile"
-                      type="text"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      value={categorySelectValue}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setFormData({ ...formData, category: v === CATEGORY_OTHER ? '' : v });
+                      }}
                       className="input-field min-h-[48px]"
-                      placeholder="例如：餐饮、交通、购物"
-                    />
+                    >
+                      <option value="">不选</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.name}>{c.name}</option>
+                      ))}
+                      <option value={CATEGORY_OTHER}>其他（手动输入）</option>
+                    </select>
+                    {categorySelectValue === CATEGORY_OTHER && (
+                      <input
+                        type="text"
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="input-field min-h-[48px] mt-2"
+                        placeholder="输入分类"
+                      />
+                    )}
                   </div>
                   <div>
                     <label className="label" htmlFor="add-description-mobile">描述</label>
@@ -234,14 +259,30 @@ export default function AddTransaction() {
             <>
               <div>
                 <label className="label" htmlFor="add-category">分类</label>
-                <input
+                <select
                   id="add-category"
-                  type="text"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  value={categorySelectValue}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setFormData({ ...formData, category: v === CATEGORY_OTHER ? '' : v });
+                  }}
                   className="input-field"
-                  placeholder="例如：餐饮、交通、购物"
-                />
+                >
+                  <option value="">不选</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                  <option value={CATEGORY_OTHER}>其他（手动输入）</option>
+                </select>
+                {categorySelectValue === CATEGORY_OTHER && (
+                  <input
+                    type="text"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="input-field mt-2"
+                    placeholder="输入分类"
+                  />
+                )}
               </div>
               <div>
                 <label className="label" htmlFor="add-description">描述</label>

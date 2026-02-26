@@ -52,3 +52,10 @@ export interface TransactionPage {
   number: number;
   size: number;
 }
+
+export interface UserCategory {
+  id: number;
+  userId: number;
+  name: string;
+  displayOrder: number;
+}
