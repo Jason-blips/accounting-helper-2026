@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useLayoutEffect } from 'react';
 import { BUILTIN_THEMES, DEFAULT_THEME_ID, getThemeById } from '../themes';
 import type { ThemeDef } from '../themes';
 

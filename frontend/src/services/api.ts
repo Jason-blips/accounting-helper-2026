@@ -217,7 +217,7 @@ export const transactionApi = {
       size?: number;
     };
     return {
-      content: (raw.content ?? []).map((t: Record<string, unknown>) => normalizeTransaction(t)),
+      content: (raw.content ?? []).map((t) => normalizeTransaction(t as Record<string, unknown>)),
       totalElements: raw.totalElements ?? 0,
       totalPages: raw.totalPages ?? 0,
       number: raw.number ?? 0,

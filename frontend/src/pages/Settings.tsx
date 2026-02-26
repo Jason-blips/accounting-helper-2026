@@ -11,7 +11,7 @@ const TIMEZONE_OPTIONS: { value: string; label: string }[] = [
 
 export default function Settings() {
   const toast = useToast();
-  const { themeId, theme, themes, setThemeId } = useTheme();
+  const { themeId, themes, setThemeId } = useTheme();
   const [repaymentDay, setRepaymentDay] = useState(15);
   const [timezone, setTimezone] = useState('Europe/London');
   const [loading, setLoading] = useState(true);

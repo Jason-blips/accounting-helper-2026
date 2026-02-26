@@ -21,6 +21,7 @@ export default function BillingCycles() {
   const [expectedIncome, setExpectedIncome] = useState<string>('');
   const [expectedExpense, setExpectedExpense] = useState<string>('');
   const [savingBudget, setSavingBudget] = useState(false);
+  const budgetModalFirstInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -188,19 +189,26 @@ export default function BillingCycles() {
       </div>
 
       {editingBudget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold mb-4">设置预期收支 · {cycleLabel(editingBudget)}</h3>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          onKeyDown={handleBudgetModalKeyDown}
+          role="presentation"
+        >
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-labelledby="budget-modal-title">
+            <h3 id="budget-modal-title" className="text-lg font-bold mb-4">设置预期收支 · {cycleLabel(editingBudget)}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">预期收入 (GBP)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget-expected-income">预期收入 (GBP)</label>
                 <input
+                  id="budget-expected-income"
+                  ref={budgetModalFirstInputRef}
                   type="number"
                   step="0.01"
                   value={expectedIncome}
                   onChange={(e) => setExpectedIncome(e.target.value)}
                   className="input-field"
                   placeholder="可选"
+                  aria-label="预期收入，单位英镑"
                 />
               </div>
               <div>

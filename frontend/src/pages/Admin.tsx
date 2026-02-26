@@ -14,6 +14,7 @@ interface AdminStats {
 }
 
 export default function Admin() {
+  const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
