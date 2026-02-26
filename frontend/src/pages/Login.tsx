@@ -150,6 +150,7 @@ export default function Login() {
             onSubmit={handleSubmit}
             name={isLogin ? 'login' : 'register'}
             autoComplete="on"
+            aria-label={isLogin ? '登录' : '注册'}
           >
             {registerSuccess && (
               <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center space-x-2">
@@ -163,8 +164,9 @@ export default function Login() {
 
             <div className="space-y-4">
               <div>
-                <label className="label">用户名</label>
+                <label className="label" htmlFor="login-username">用户名</label>
                 <input
+                  id="login-username"
                   type="text"
                   name="username"
                   required
@@ -176,7 +178,7 @@ export default function Login() {
                 />
               </div>
               <div>
-                <label className="label">密码</label>
+                <label className="label" htmlFor="login-password">密码</label>
                 {!isLogin && (
                   <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2 flex items-center gap-2">
                     <span aria-hidden className="text-amber-600">🔐</span>
@@ -185,6 +187,7 @@ export default function Login() {
                 )}
                 <div className="flex gap-2 flex-wrap">
                   <input
+                    id="login-password"
                     type="password"
                     name="password"
                     required
@@ -200,6 +203,7 @@ export default function Login() {
                       onClick={handleUseRecommendedPassword}
                       className="btn-secondary whitespace-nowrap px-4 shrink-0"
                       title="生成并填充推荐强密码，并复制到剪贴板"
+                      aria-label="生成并填充推荐强密码，并复制到剪贴板"
                     >
                       {passwordCopied ? '✓ 已复制' : '生成推荐密码'}
                     </button>
@@ -213,8 +217,9 @@ export default function Login() {
               </div>
               {!isLogin && (
                 <div>
-                  <label className="label">邮箱（可选）</label>
+                  <label className="label" htmlFor="login-email">邮箱（可选）</label>
                   <input
+                    id="login-email"
                     type="email"
                     name="email"
                     autoComplete="email"

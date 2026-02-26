@@ -122,15 +122,16 @@ export default function EditTransaction() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="card p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="card p-8 space-y-6" aria-label="编辑交易">
           <div>
-            <label className="label">
+            <label className="label" htmlFor="edit-type">
               <span className="flex items-center space-x-2">
                 <span>交易类型</span>
                 <span className="text-red-500">*</span>
               </span>
             </label>
             <select
+              id="edit-type"
               value={formData.transaction_type}
               onChange={(e) => setFormData({ ...formData, transaction_type: e.target.value as '收入' | '支出' })}
               className="input-field"
@@ -143,13 +144,14 @@ export default function EditTransaction() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="label">
+              <label className="label" htmlFor="edit-amount">
                 <span className="flex items-center space-x-2">
                   <span>金额</span>
                   <span className="text-red-500">*</span>
                 </span>
               </label>
               <input
+                id="edit-amount"
                 type="number"
                 step="0.01"
                 value={formData.amount}
@@ -160,13 +162,14 @@ export default function EditTransaction() {
               />
             </div>
             <div>
-              <label className="label">
+              <label className="label" htmlFor="edit-currency">
                 <span className="flex items-center space-x-2">
                   <span>货币</span>
                   <span className="text-red-500">*</span>
                 </span>
               </label>
               <select
+                id="edit-currency"
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                 className="input-field"
@@ -181,13 +184,14 @@ export default function EditTransaction() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="edit-date">
               <span className="flex items-center space-x-2">
                 <span>交易日期</span>
                 <span className="text-red-500">*</span>
               </span>
             </label>
             <input
+              id="edit-date"
               type="date"
               value={formData.created_at}
               onChange={(e) => setFormData({ ...formData, created_at: e.target.value })}
@@ -197,13 +201,14 @@ export default function EditTransaction() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="edit-payment">
               <span className="flex items-center space-x-2">
                 <span>支付方式</span>
                 <span className="text-red-500">*</span>
               </span>
             </label>
             <select
+              id="edit-payment"
               value={formData.payment_method}
               onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
               className="input-field"
@@ -216,8 +221,9 @@ export default function EditTransaction() {
           </div>
 
           <div>
-            <label className="label">分类</label>
+            <label className="label" htmlFor="edit-category">分类</label>
             <input
+              id="edit-category"
               type="text"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -227,8 +233,9 @@ export default function EditTransaction() {
           </div>
 
           <div>
-            <label className="label">描述</label>
+            <label className="label" htmlFor="edit-description">描述</label>
             <textarea
+              id="edit-description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="input-field resize-none"

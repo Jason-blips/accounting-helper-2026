@@ -83,15 +83,16 @@ export default function AddTransaction() {
 
         {error && <ErrorBanner message={error} />}
 
-        <form onSubmit={handleSubmit} className="card p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="card p-8 space-y-6" aria-label="添加交易">
           <div>
-            <label className="label">
+            <label className="label" htmlFor="add-type">
               <span className="flex items-center space-x-2">
                 <span>交易类型</span>
                 <span className="text-red-500">*</span>
               </span>
             </label>
             <select
+              id="add-type"
               value={formData.transaction_type}
               onChange={(e) => setFormData({ ...formData, transaction_type: e.target.value as '收入' | '支出' })}
               className="input-field min-h-[48px]"
@@ -104,13 +105,14 @@ export default function AddTransaction() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="label">
+              <label className="label" htmlFor="add-amount">
                 <span className="flex items-center space-x-2">
                   <span>金额</span>
                   <span className="text-red-500">*</span>
                 </span>
               </label>
               <input
+                id="add-amount"
                 type="number"
                 step="0.01"
                 value={formData.amount}
@@ -121,13 +123,14 @@ export default function AddTransaction() {
               />
             </div>
             <div>
-              <label className="label">
+              <label className="label" htmlFor="add-currency">
                 <span className="flex items-center space-x-2">
                   <span>货币</span>
                   <span className="text-red-500">*</span>
                 </span>
               </label>
               <select
+                id="add-currency"
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                 className="input-field min-h-[48px]"
@@ -142,13 +145,14 @@ export default function AddTransaction() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="add-date">
               <span className="flex items-center space-x-2">
                 <span>交易日期</span>
                 <span className="text-red-500">*</span>
               </span>
             </label>
             <input
+              id="add-date"
               type="date"
               value={formData.created_at}
               onChange={(e) => setFormData({ ...formData, created_at: e.target.value })}
@@ -158,13 +162,14 @@ export default function AddTransaction() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="add-payment">
               <span className="flex items-center space-x-2">
                 <span>支付方式</span>
                 <span className="text-red-500">*</span>
               </span>
             </label>
             <select
+              id="add-payment"
               value={formData.payment_method}
               onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
               className="input-field min-h-[48px]"
@@ -195,13 +200,15 @@ export default function AddTransaction() {
                       type="button"
                       onClick={() => setShowMoreOptions(false)}
                       className="text-sm text-gray-500 hover:text-gray-700 touch-target"
+                      aria-label="收起分类与描述"
                     >
                       收起
                     </button>
                   </div>
                   <div>
-                    <label className="label">分类</label>
+                    <label className="label" htmlFor="add-category-mobile">分类</label>
                     <input
+                      id="add-category-mobile"
                       type="text"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -210,8 +217,9 @@ export default function AddTransaction() {
                     />
                   </div>
                   <div>
-                    <label className="label">描述</label>
+                    <label className="label" htmlFor="add-description-mobile">描述</label>
                     <textarea
+                      id="add-description-mobile"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       className="input-field resize-none min-h-[80px]"
@@ -225,8 +233,9 @@ export default function AddTransaction() {
           ) : (
             <>
               <div>
-                <label className="label">分类</label>
+                <label className="label" htmlFor="add-category">分类</label>
                 <input
+                  id="add-category"
                   type="text"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -235,8 +244,9 @@ export default function AddTransaction() {
                 />
               </div>
               <div>
-                <label className="label">描述</label>
+                <label className="label" htmlFor="add-description">描述</label>
                 <textarea
+                  id="add-description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input-field resize-none"

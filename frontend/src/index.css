@@ -6,6 +6,15 @@
   * {
     @apply transition-colors duration-200;
   }
+
+  /* 键盘焦点可见：仅在使用键盘聚焦时显示轮廓，提升无障碍体验 */
+  *:focus {
+    outline: none;
+  }
+  *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
   
   body {
     margin: 0;

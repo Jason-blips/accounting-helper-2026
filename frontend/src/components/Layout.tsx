@@ -110,7 +110,13 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 app-shell">
-      <nav className="bg-white/95 backdrop-blur-lg shadow-sm border-b border-gray-200 sticky top-0 z-50 safe-top">
+      <a
+        href="#main-content"
+        className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:w-auto focus:h-auto focus:m-0 focus:overflow-visible focus:[clip:auto]"
+      >
+        跳过导航，进入主内容
+      </a>
+      <nav className="bg-white/95 backdrop-blur-lg shadow-sm border-b border-gray-200 sticky top-0 z-50 safe-top" aria-label="主导航">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 min-h-[3.5rem] sm:h-16">
             <div className="flex items-center gap-4 sm:gap-8">
@@ -173,7 +179,8 @@ export default function Layout({ children }: LayoutProps) {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg touch-target"
+                className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg touch-target focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                aria-label="退出登录"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -236,7 +243,8 @@ export default function Layout({ children }: LayoutProps) {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex items-center w-full px-5 py-4 text-base font-medium text-red-600 hover:bg-red-50 touch-target text-left"
+                className="flex items-center w-full px-5 py-4 text-base font-medium text-red-600 hover:bg-red-50 touch-target text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset"
+                aria-label="退出登录"
               >
                 <NavLinkContent path="/logout" label="退出登录" icon="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </button>
@@ -245,7 +253,7 @@ export default function Layout({ children }: LayoutProps) {
         </>
       )}
 
-      <main className="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-8 safe-bottom">
+      <main id="main-content" className="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-8 safe-bottom" tabIndex={-1}>
         {children}
       </main>
       <BottomNav />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import EmptyState from '../components/EmptyState';
@@ -79,6 +79,18 @@ export default function BillingCycles() {
 
   const shareUrl = (c: BillingCycleDto) =>
     `/share?period=cycle&from=${c.startDate}&to=${c.endDate}`;
+
+  useEffect(() => {
+    if (editingBudget) {
+      budgetModalFirstInputRef.current?.focus();
+    }
+  }, [editingBudget]);
+
+  const handleBudgetModalKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setEditingBudget(null);
+    }
+  };
 
   return (
     <Layout>
@@ -192,14 +204,16 @@ export default function BillingCycles() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">预期支出 (GBP)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget-expected-expense">预期支出 (GBP)</label>
                 <input
+                  id="budget-expected-expense"
                   type="number"
                   step="0.01"
                   value={expectedExpense}
                   onChange={(e) => setExpectedExpense(e.target.value)}
                   className="input-field"
                   placeholder="可选"
+                  aria-label="预期支出，单位英镑"
                 />
               </div>
             </div>
@@ -208,6 +222,7 @@ export default function BillingCycles() {
                 type="button"
                 onClick={() => setEditingBudget(null)}
                 className="btn-secondary flex-1"
+                aria-label="取消并关闭"
               >
                 取消
               </button>
@@ -216,6 +231,7 @@ export default function BillingCycles() {
                 onClick={saveBudget}
                 disabled={savingBudget}
                 className="btn-primary flex-1"
+                aria-label="保存预期收支"
               >
                 {savingBudget ? '保存中...' : '保存'}
               </button>
