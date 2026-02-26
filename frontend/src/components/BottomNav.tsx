@@ -11,7 +11,11 @@ export default function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-bottom" aria-label="主导航">
+    <nav
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t safe-bottom"
+      style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+      aria-label="主导航"
+    >
       <div className="flex justify-around items-center h-16">
         {items.map(({ path, label, icon, primary }) => {
           const active = location.pathname === path;
@@ -25,15 +29,21 @@ export default function BottomNav() {
                 aria-current={active ? 'page' : undefined}
               >
                 <span
-                  className={`flex items-center justify-center w-12 h-12 rounded-full transition-colors ${
-                    active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-blue-100 text-blue-600'
-                  }`}
+                  className="flex items-center justify-center w-12 h-12 rounded-full transition-colors text-white"
+                  style={
+                    active
+                      ? { backgroundColor: 'var(--theme-primary)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.2), 0 4px 6px -2px rgba(0,0,0,0.1)' }
+                      : { backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }
+                  }
                 >
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
                   </svg>
                 </span>
-                <span className={`text-xs mt-1 font-medium truncate max-w-full px-1 ${active ? 'text-blue-600' : 'text-gray-500'}`}>
+                <span
+                  className="text-xs mt-1 font-medium truncate max-w-full px-1"
+                  style={active ? { color: 'var(--theme-primary)' } : { color: 'var(--theme-text-muted)' }}
+                >
                   {label}
                 </span>
               </Link>
@@ -43,7 +53,8 @@ export default function BottomNav() {
             <Link
               key={path}
               to={path}
-              className={`flex flex-col items-center justify-center flex-1 h-full min-w-0 touch-target ${active ? 'text-blue-600' : 'text-gray-500'}`}
+              className="flex flex-col items-center justify-center flex-1 h-full min-w-0 touch-target"
+              style={{ color: active ? 'var(--theme-primary)' : 'var(--theme-text-muted)' }}
               aria-current={active ? 'page' : undefined}
             >
               <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

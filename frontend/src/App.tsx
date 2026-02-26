@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { isAuthenticated } from './services/auth';
 import { ToastProvider } from './contexts/ToastContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
@@ -31,8 +32,9 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <ToastProvider>
-      <BrowserRouter>
+    <ThemeProvider>
+      <ToastProvider>
+        <BrowserRouter>
         <NetworkBanner />
         <ApiErrorBanner />
         <Routes>
@@ -126,9 +128,10 @@ function App() {
           }
         />
         <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </BrowserRouter>
-    </ToastProvider>
+      </Routes>
+        </BrowserRouter>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

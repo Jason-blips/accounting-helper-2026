@@ -2,20 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 默认主题变量（由 ThemeContext 按所选主题覆盖） */
+:root {
+  --theme-bg: #f3f3f3;
+  --theme-surface: #ffffff;
+  --theme-surface-hover: #f0f0f0;
+  --theme-text: #333333;
+  --theme-text-muted: #6e6e6e;
+  --theme-primary: #0066cc;
+  --theme-primary-hover: #0052a3;
+  --theme-primary-soft: #e8f4fd;
+  --theme-border: #e0e0e0;
+  --theme-input-bg: #ffffff;
+  --theme-focus-ring: #0066cc;
+  --theme-nav-bg: #ffffff;
+  --primary-50: #e8f4fd;
+  --primary-500: #0066cc;
+  --primary-600: #0066cc;
+  --primary-700: #0052a3;
+  --primary-800: #0052a3;
+}
+
 @layer base {
   * {
     @apply transition-colors duration-200;
   }
 
-  /* 键盘焦点可见：仅在使用键盘聚焦时显示轮廓，提升无障碍体验 */
   *:focus {
     outline: none;
   }
   *:focus-visible {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid var(--theme-focus-ring);
     outline-offset: 2px;
   }
-  
+
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -23,8 +43,8 @@
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    @apply bg-gradient-to-br from-gray-50 via-white to-gray-50;
-    /* 防止移动端双击缩放等 */
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
     touch-action: manipulation;
   }
 
@@ -35,96 +55,110 @@
 }
 
 @layer components {
-  /* 卡片样式 */
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300;
+    background-color: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    @apply rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
   }
-  
+  .card:hover {
+    background-color: var(--theme-surface-hover);
+  }
+
   .card-hover {
     @apply hover:shadow-lg hover:-translate-y-0.5;
   }
-  
-  /* 按钮样式（移动端保证最小触控高度） */
+
   .btn-primary {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg font-medium 
-           hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 
-           focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 
-           shadow-md hover:shadow-lg min-h-[44px] md:min-h-0;
+    background: linear-gradient(to right, var(--theme-primary), var(--theme-primary-hover));
+    @apply text-white px-6 py-2.5 rounded-lg font-medium min-h-[44px] md:min-h-0
+           focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
+           transition-all duration-200 shadow-md hover:shadow-lg;
+    --tw-ring-color: var(--theme-focus-ring);
   }
-  
+  .btn-primary:hover {
+    background: linear-gradient(to right, var(--theme-primary-hover), var(--theme-primary));
+  }
+
   .btn-secondary {
-    @apply bg-white text-gray-700 px-6 py-2.5 rounded-lg font-medium border border-gray-300
-           hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 
-           transition-all duration-200 min-h-[44px] md:min-h-0;
+    background-color: var(--theme-surface);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-border);
+    @apply px-6 py-2.5 rounded-lg font-medium min-h-[44px] md:min-h-0
+           focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200;
   }
-  
+  .btn-secondary:hover {
+    background-color: var(--theme-surface-hover);
+  }
+  .btn-secondary:focus {
+    --tw-ring-color: var(--theme-text-muted);
+  }
+
   .btn-danger {
     @apply bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium
-           hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 
+           hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500
            focus:ring-offset-2 transition-all duration-200 min-h-[44px] md:min-h-0;
   }
-  
-  /* 输入框样式（移动端加大触控区域） */
+
   .input-field {
-    @apply w-full border border-gray-300 rounded-lg px-4 py-2.5 min-h-[44px] md:min-h-0 text-gray-900 text-base
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-           transition-all duration-200 bg-white;
+    background-color: var(--theme-input-bg);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-border);
+    @apply w-full rounded-lg px-4 py-2.5 min-h-[44px] md:min-h-0 text-base
+           focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200;
+    --tw-ring-color: var(--theme-focus-ring);
   }
-  
   .input-field:focus {
     @apply shadow-md;
   }
-  
-  /* 标签样式 */
+
   .label {
-    @apply block text-sm font-semibold text-gray-700 mb-2;
+    color: var(--theme-text);
+    @apply block text-sm font-semibold mb-2;
   }
-  
-  /* 统计卡片 */
+
   .stat-card {
     @apply card card-hover p-6 relative overflow-hidden;
   }
-  
   .stat-card::before {
     content: '';
     @apply absolute top-0 left-0 right-0 h-1 bg-gradient-to-r;
   }
-  
   .stat-card.income::before {
     @apply from-green-400 to-green-600;
   }
-  
   .stat-card.expense::before {
     @apply from-red-400 to-red-600;
   }
-  
   .stat-card.balance::before {
-    @apply from-blue-400 to-blue-600;
-  }
-  
-  /* 加载动画 */
-  .spinner {
-    @apply animate-spin rounded-full border-4 border-gray-200 border-t-blue-600;
-  }
-  
-  /* 导航链接 */
-  .nav-link {
-    @apply flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-700 
-           hover:bg-gray-100 hover:text-blue-600 transition-all duration-200;
-  }
-  
-  .nav-link.active {
-    @apply bg-blue-50 text-blue-600 font-semibold;
+    background: linear-gradient(to right, var(--theme-primary), var(--theme-primary-hover));
   }
 
-  /* 移动端 / 上架 App：安全区（刘海、底部横条） */
+  .spinner {
+    @apply animate-spin rounded-full border-4;
+    border-color: var(--theme-border);
+    border-top-color: var(--theme-primary);
+  }
+
+  .nav-link {
+    color: var(--theme-text-muted);
+    @apply flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+  }
+  .nav-link:hover {
+    color: var(--theme-primary);
+    background-color: var(--theme-surface-hover);
+  }
+  .nav-link.active {
+    background-color: var(--theme-primary-soft);
+    color: var(--theme-primary);
+    @apply font-semibold;
+  }
+
   .safe-top {
     padding-top: env(safe-area-inset-top, 0);
   }
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
   }
-  /* 触控目标最小尺寸（约 44px，便于手指点击） */
   .touch-target {
     min-height: 44px;
     min-width: 44px;

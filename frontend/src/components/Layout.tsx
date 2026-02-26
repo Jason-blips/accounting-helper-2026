@@ -112,17 +112,23 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 app-shell">
       <a
         href="#main-content"
-        className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:w-auto focus:h-auto focus:m-0 focus:overflow-visible focus:[clip:auto]"
+        className="sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:w-auto focus:h-auto focus:m-0 focus:overflow-visible focus:[clip:auto]"
+        style={{ backgroundColor: 'var(--theme-primary)' } as React.CSSProperties}
       >
         跳过导航，进入主内容
       </a>
-      <nav className="bg-white/95 backdrop-blur-lg shadow-sm border-b border-gray-200 sticky top-0 z-50 safe-top" aria-label="主导航">
+      <nav
+        className="backdrop-blur-lg shadow-sm border-b sticky top-0 z-50 safe-top"
+        style={{ backgroundColor: 'color-mix(in srgb, var(--theme-nav-bg) 95%, transparent)', borderColor: 'var(--theme-border)' }}
+        aria-label="主导航"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 min-h-[3.5rem] sm:h-16">
             <div className="flex items-center gap-4 sm:gap-8">
               <Link
                 to="/"
-                className="flex items-center gap-2 text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"
+                className="flex items-center gap-2 text-lg sm:text-xl font-bold bg-clip-text text-transparent"
+                style={{ backgroundImage: 'linear-gradient(to right, var(--theme-primary), var(--theme-primary-hover))' } as React.CSSProperties}
               >
                 <span className="text-xl sm:text-2xl">💰</span>
                 <span className="hidden sm:inline">Counting Helper</span>
@@ -156,7 +162,8 @@ export default function Layout({ children }: LayoutProps) {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen((o) => !o)}
-                className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg text-gray-600 hover:bg-gray-100 touch-target"
+                className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg touch-target hover:opacity-80"
+                style={{ color: 'var(--theme-text-muted)' }}
                 aria-label="打开菜单"
               >
                 {mobileMenuOpen ? (
@@ -200,13 +207,21 @@ export default function Layout({ children }: LayoutProps) {
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden
           />
-          <div className="fixed top-[3.5rem] sm:top-16 left-0 right-0 z-50 md:hidden bg-white border-b border-gray-200 shadow-xl rounded-b-2xl overflow-hidden safe-top max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div
+            className="fixed top-[3.5rem] sm:top-16 left-0 right-0 z-50 md:hidden border-b shadow-xl rounded-b-2xl overflow-hidden safe-top max-h-[calc(100vh-4rem)] overflow-y-auto"
+            style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
+          >
             <div className="py-2">
               {navItems.map(({ path, label, icon }) => (
                 <Link
                   key={path}
                   to={path}
-                  className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive(path) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                  className="flex items-center px-5 py-4 text-base font-medium touch-target"
+                  style={
+                    isActive(path)
+                      ? { backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }
+                      : { color: 'var(--theme-text)' }
+                  }
                 >
                   <NavLinkContent path={path} label={label} icon={icon} />
                 </Link>
@@ -215,28 +230,48 @@ export default function Layout({ children }: LayoutProps) {
                 <>
                   <Link
                     to="/admin"
-                    className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive('/admin') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className="flex items-center px-5 py-4 text-base font-medium touch-target"
+                    style={
+                      isActive('/admin')
+                        ? { backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }
+                        : { color: 'var(--theme-text)' }
+                    }
                   >
                     <NavLinkContent path="/admin" label="用户管理" icon="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                   </Link>
                   <Link
                     to="/performance"
-                    className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive('/performance') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                    className="flex items-center px-5 py-4 text-base font-medium touch-target"
+                    style={
+                      isActive('/performance')
+                        ? { backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }
+                        : { color: 'var(--theme-text)' }
+                    }
                   >
                     <NavLinkContent path="/performance" label="性能监控" icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </Link>
                 </>
               )}
-              <div className="border-t border-gray-100 my-2" />
+              <div className="border-t my-2" style={{ borderColor: 'var(--theme-border)' }} />
               <Link
                 to="/settings"
-                className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive('/settings') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                className="flex items-center px-5 py-4 text-base font-medium touch-target"
+                style={
+                  isActive('/settings')
+                    ? { backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }
+                    : { color: 'var(--theme-text)' }
+                }
               >
                 <NavLinkContent path="/settings" label="设置" icon="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               </Link>
               <Link
                 to="/about"
-                className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive('/about') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+                className="flex items-center px-5 py-4 text-base font-medium touch-target"
+                style={
+                  isActive('/about')
+                    ? { backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }
+                    : { color: 'var(--theme-text)' }
+                }
               >
                 <NavLinkContent path="/about" label="关于" icon="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </Link>
