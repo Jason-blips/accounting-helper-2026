@@ -1,4 +1,4 @@
-# Counting Helper — 应用商店发布评估
+# Tally Drop 落记 — 应用商店发布评估
 
 ## 当前项目形态
 
@@ -82,6 +82,6 @@
 
 ## 简短结论
 
-- **理解你的目标**：把 Counting Helper 做成「能上架应用商店」的 App，而不是只在浏览器里用。  
+- **理解你的目标**：把 Tally Drop 落记 做成「能上架应用商店」的 App，而不是只在浏览器里用。  
 - **更容易的一条路**：用 **Capacitor** 把现有 React 前端打成 **Android App**，先发布到 **Google Play**；同一套代码以后可再打 iOS 版上架 App Store。  
 - **最难/最前提的一步**：把 **后端部署到公网** 并配置好 HTTPS，App 才能在实际用户设备上正常使用。

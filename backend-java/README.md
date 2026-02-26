@@ -1,4 +1,4 @@
-# Counting Helper Backend - Java版本
+# Tally Drop 落记 Backend - Java版本
 
 智能记账应用后端服务（Spring Boot实现）
 

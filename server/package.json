@@ -1,7 +1,7 @@
 {
   "name": "counting-helper-server",
   "version": "1.0.0",
-  "description": "Counting Helper Backend Server",
+  "description": "Tally Drop 落记 Backend Server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

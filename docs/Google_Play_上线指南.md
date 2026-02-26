@@ -1,4 +1,4 @@
-# Counting Helper — Google Play 上线指南
+# Tally Drop 落记 — Google Play 上线指南
 
 本文说明如何在不改动**现有功能与数据库**的前提下，把当前项目以**手机端 App** 形式上架 Google Play，用作客户端推广。并评估「命令行打包」与「使用 Android Studio」两种方式，给出推荐与具体步骤。
 

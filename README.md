@@ -1,4 +1,4 @@
-# Counting Helper - 智能记账应用
+# Tally Drop 落记 - 智能记账应用
 
 **About:** Lightweight expense tracking with multi-currency, billing cycles, and AI insights — one codebase for Web and Android.
 
@@ -26,7 +26,7 @@
 ## 📁 项目结构
 
 ```
-Counting Helper/
+Tally Drop 落记/
 ├── backend-java/       # Spring Boot 后端
 │   ├── src/
 │   ├── pom.xml

@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "counting-helper-api",
-		"name": "Counting Helper API",
+		"name": "Tally Drop 落记 API",
 		"description": "智能记账应用后端API测试集合",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},

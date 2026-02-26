@@ -1,4 +1,4 @@
-# Google Play 商店信息（Counting Helper）
+# Google Play 商店信息（Accounting Helper）
 
 发布到 Google Play 时，在 Play Console 中填写以下内容可作参考。
 
@@ -6,9 +6,9 @@
 
 ## 应用名称（App name）
 
-**Counting Helper**
+**Tally Drop 落记**
 
-（或：Counting Helper - 智能记账）
+（或：Tally Drop 落记 - 智能记账）
 
 ---
 
@@ -26,7 +26,7 @@ Track income & expenses, multi-currency, AI tips. Simple personal bookkeeping.
 
 **示例（英文）：**
 
-Counting Helper helps you track daily income and expenses in one place.
+Accounting Helper helps you track daily income and expenses in one place.
 
 • **Quick entries** – Add income or expense with amount, currency, category, and payment method.  
 • **Multi-currency** – Support for GBP, CNY, USD, EUR with conversion.  
@@ -39,7 +39,7 @@ Ideal for personal budgeting and expense tracking. Free to use.
 
 **示例（中文）：**
 
-Counting Helper 帮你在一处记录每日收支。
+Tally Drop 落记 帮你在一处记录每日收支。
 
 • **快速记账** – 记录收入或支出，支持金额、币种、分类与支付方式。  
 • **多币种** – 支持 GBP、CNY、USD、EUR 及汇率转换。  

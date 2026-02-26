@@ -322,7 +322,7 @@ export default function ShareCard({
       )}
 
       <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 text-center">
-        <span className="text-sm font-medium text-gray-500">Counting Helper · 记一笔</span>
+        <span className="text-sm font-medium text-gray-500">Tally Drop 落记 · 记一笔</span>
       </div>
     </div>
   );

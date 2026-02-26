@@ -1,4 +1,4 @@
-# Building Counting Helper for App Stores
+# Building Tally Drop 落记 for App Stores
 
 This document describes how to build **Android** (Google Play) and optionally **iOS** (App Store) apps from the existing React frontend using Capacitor.
 

@@ -8,7 +8,7 @@ export default function About() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">关于 Counting Helper</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">关于 Accounting Helper</h1>
           <p className="text-gray-600 mb-4">
             智能记账应用，助你记录收支、分析消费，并获取省钱建议。
           </p>
@@ -37,7 +37,7 @@ export default function About() {
           </div>
         )}
         <p className="text-center text-gray-400 text-sm">
-          Thank you for using Counting Helper.
+          Thank you for using Tally Drop 落记.
         </p>
       </div>
     </Layout>

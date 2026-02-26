@@ -64,7 +64,7 @@ sudo nano /etc/systemd/system/counting-helper.service
 
 ```ini
 [Unit]
-Description=Counting Helper Backend
+Description=Tally Drop 落记 Backend
 After=network.target
 
 [Service]

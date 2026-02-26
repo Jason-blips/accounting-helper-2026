@@ -15,7 +15,7 @@
     <groupId>com.countinghelper</groupId>
     <artifactId>counting-helper-backend</artifactId>
     <version>1.0.0</version>
-    <name>Counting Helper Backend</name>
+    <name>Tally Drop 落记 Backend</name>
     <description>智能记账应用后端服务</description>
     
     <properties>

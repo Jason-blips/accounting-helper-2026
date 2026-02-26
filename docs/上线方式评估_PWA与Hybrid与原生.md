@@ -1,6 +1,6 @@
 # 上线方式评估：PWA / Cordova·Capacitor 打包 / 原生 Android
 
-**目标**：把 Counting Helper 上线应用商店，或发给别人安装使用。  
+**目标**：把 Tally Drop 落记 上线应用商店，或发给别人安装使用。  
 **待选方案**：  
 ① 继续用当前技术栈，通过 **PWA** 或 **Cordova/Capacitor** 打包成 App；  
 ② 用 **Android Studio 开发原生 Android 应用**。

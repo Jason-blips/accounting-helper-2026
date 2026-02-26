@@ -72,6 +72,6 @@ spring.main.lazy-initialization: ${LAZY_INIT:true}
 
 ## 若仍部署失败
 
-1. 查看 Render **Logs**：确认是否有 “Tomcat started on port 10000” 和 “Counting Helper Backend Started!”。
+1. 查看 Render **Logs**：确认是否有 “Tomcat started on port 10000” 和 “Tally Drop 落记 Backend Started!”。
 2. 若端口已启动但仍失败：检查 **Health Check Path** 是否为 `/api/health`，且无多余斜杠或拼写错误。
 3. 若为 Blueprint 部署：可参考项目根目录 `render.yaml` 中的 `healthCheckPath` 配置。
