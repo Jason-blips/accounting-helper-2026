@@ -3,6 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 import { setToken, setUserRole } from '../services/auth';
 
+/** 生成推荐的长难复杂密码（含大小写、数字、符号） */
+function generateStrongPassword(): string {
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+  const digits = '23456789';
+  const symbols = '!@#$%&*';
+  const all = lower + upper + digits + symbols;
+  const pick = (s: string, n: number) =>
+    Array.from({ length: n }, () => s[Math.floor(Math.random() * s.length)]).join('');
+  return [
+    pick(lower, 4),
+    pick(upper, 3),
+    pick(digits, 3),
+    pick(symbols, 2),
+    pick(all, 4),
+  ]
+    .join('')
+    .split('')
+    .sort(() => Math.random() - 0.5)
+    .join('');
+}
+
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
@@ -10,11 +32,26 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  /** 注册成功后提示，并进入登录流程（不直接进主界面） */
+  const [registerSuccess, setRegisterSuccess] = useState('');
+  const [passwordCopied, setPasswordCopied] = useState(false);
   const navigate = useNavigate();
+
+  const handleUseRecommendedPassword = () => {
+    const pwd = generateStrongPassword();
+    setPassword(pwd);
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(pwd).then(() => {
+        setPasswordCopied(true);
+        setTimeout(() => setPasswordCopied(false), 2000);
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setRegisterSuccess('');
     setLoading(true);
 
     try {
@@ -23,11 +60,22 @@ export default function Login() {
         response = await authApi.login(username, password);
       } else {
         response = await authApi.register(username, password, email);
+        const token = response?.token;
+        if (!token) {
+          setError('注册失败');
+          return;
+        }
+        // 注册成功：不直接进主界面，显示成功提示并切换到登录流程，让用户再登录一次
+        setRegisterSuccess('注册成功！请使用下方账号登录。');
+        setIsLogin(true);
+        setPassword('');
+        setLoading(false);
+        return;
       }
 
       const token = response?.token;
       if (!token) {
-        setError(isLogin ? '登录失败' : '注册失败');
+        setError('登录失败');
         return;
       }
       setToken(token);
@@ -43,7 +91,6 @@ export default function Login() {
       }
       navigate('/');
     } catch (err: any) {
-      // 后端登录失败返回 400 + error；注册失败 400；其他 401 等也统一显示文案
       const raw = err.response?.data?.error;
       const safe = raw === '用户名已存在' || raw === '用户名或密码错误'
         ? raw
@@ -70,7 +117,20 @@ export default function Login() {
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form
+            className="space-y-6"
+            onSubmit={handleSubmit}
+            name={isLogin ? 'login' : 'register'}
+            autoComplete="on"
+          >
+            {registerSuccess && (
+              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center space-x-2">
+                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-medium">{registerSuccess}</span>
+              </div>
+            )}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2">
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +145,9 @@ export default function Login() {
                 <label className="label">用户名</label>
                 <input
                   type="text"
+                  name="username"
                   required
+                  autoComplete="username"
                   className="input-field"
                   placeholder="请输入用户名"
                   value={username}
@@ -94,20 +156,41 @@ export default function Login() {
               </div>
               <div>
                 <label className="label">密码</label>
-                <input
-                  type="password"
-                  required
-                  className="input-field"
-                  placeholder="请输入密码"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    name="password"
+                    required
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
+                    className="input-field flex-1"
+                    placeholder={isLogin ? '请输入密码' : '请设置密码（建议使用推荐密码）'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  {!isLogin && (
+                    <button
+                      type="button"
+                      onClick={handleUseRecommendedPassword}
+                      className="btn-secondary whitespace-nowrap px-3"
+                      title="生成并填充推荐强密码，并复制到剪贴板"
+                    >
+                      {passwordCopied ? '已复制' : '推荐密码'}
+                    </button>
+                  )}
+                </div>
+                {!isLogin && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    可使用推荐密码并保存到浏览器或密码管理器中
+                  </p>
+                )}
               </div>
               {!isLogin && (
                 <div>
                   <label className="label">邮箱（可选）</label>
                   <input
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     className="input-field"
                     placeholder="example@email.com"
                     value={email}
@@ -145,6 +228,7 @@ export default function Login() {
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError('');
+                  setRegisterSuccess('');
                 }}
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
               >
