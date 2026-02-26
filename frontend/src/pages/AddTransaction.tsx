@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
+import ErrorBanner from '../components/ErrorBanner';
 import { transactionApi, settingsApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import { getTodayInTimezone } from '../utils/format';
@@ -65,16 +66,7 @@ export default function AddTransaction() {
           <p className="text-gray-600">记录您的收入和支出</p>
         </div>
 
-        {error && (
-          <div className="card p-4 bg-red-50 border-red-200">
-            <div className="flex items-center space-x-2 text-red-700">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="font-medium">{error}</span>
-            </div>
-          </div>
-        )}
+        {error && <ErrorBanner message={error} />}
 
         <form onSubmit={handleSubmit} className="card p-8 space-y-6">
           <div>

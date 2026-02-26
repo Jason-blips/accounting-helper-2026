@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Layout from '../components/Layout';
+import ErrorBanner from '../components/ErrorBanner';
+import EmptyState from '../components/EmptyState';
 import PullToRefresh from '../components/PullToRefresh';
 import { statsApi, transactionApi, adminApi, authApi } from '../services/api';
 import { formatCurrency } from '../utils/format';
@@ -169,23 +171,17 @@ export default function Dashboard() {
   if (!stats) {
     return (
       <Layout>
-        <div className="text-center py-20 px-4 max-w-md mx-auto">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+        <div className="max-w-md mx-auto py-20 px-4">
+          <ErrorBanner message={loadError || '加载失败'} className="mb-4" />
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => { setLoading(true); setLoadError(null); loadData(); }}
+              className="btn-primary"
+            >
+              重试
+            </button>
           </div>
-          <p className="text-red-600 text-lg font-medium">加载失败</p>
-          {loadError && (
-            <p className="mt-2 text-gray-600 text-sm">{loadError}</p>
-          )}
-          <button
-            type="button"
-            onClick={() => { setLoading(true); setLoadError(null); loadData(); }}
-            className="mt-4 btn-primary"
-          >
-            重试
-          </button>
         </div>
       </Layout>
     );
@@ -416,15 +412,20 @@ export default function Dashboard() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[350px] text-gray-400">
-              <div className="text-center">
-                <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <p className="text-lg font-medium">暂无数据</p>
-                <p className="text-sm mt-1">添加交易后即可查看趋势图表</p>
-                <Link to="/add" className="mt-4 btn-primary inline-flex items-center gap-2 text-sm">记一笔</Link>
-              </div>
+            <div className="flex items-center justify-center h-[350px]">
+              <EmptyState
+                title="暂无数据"
+                description="添加交易后即可查看趋势图表"
+                action={
+                  <Link to="/add" className="btn-primary inline-flex items-center gap-2 text-sm">记一笔</Link>
+                }
+                compact
+                icon={
+                  <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                }
+              />
             </div>
           )}
         </div>
@@ -480,15 +481,20 @@ export default function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-gray-400">
-              <div className="text-center">
-                <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-                <p className="text-lg font-medium">暂无数据</p>
-                <p className="text-sm mt-1">添加交易后即可查看余额趋势</p>
-                <Link to="/add" className="mt-4 btn-primary inline-flex items-center gap-2 text-sm">记一笔</Link>
-              </div>
+            <div className="flex items-center justify-center h-[300px]">
+              <EmptyState
+                title="暂无数据"
+                description="添加交易后即可查看余额趋势"
+                action={
+                  <Link to="/add" className="btn-primary inline-flex items-center gap-2 text-sm">记一笔</Link>
+                }
+                compact
+                icon={
+                  <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                }
+              />
             </div>
           )}
         </div>

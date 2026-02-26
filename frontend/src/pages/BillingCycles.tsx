@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
+import EmptyState from '../components/EmptyState';
 import { billingCyclesApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import { formatCurrency } from '../utils/format';
@@ -100,9 +101,14 @@ export default function BillingCycles() {
             <p className="text-gray-500 mt-3">加载周期...</p>
           </div>
         ) : cycles.length === 0 ? (
-          <div className="card p-12 text-center text-gray-500">
-            <p>暂无周期数据，请先在<Link to="/settings" className="text-blue-600 hover:underline font-medium">设置</Link>中配置还款日，并确保有交易记录</p>
-          </div>
+          <EmptyState
+            title="暂无周期数据"
+            description={
+              <>
+                请先在<Link to="/settings" className="text-blue-600 hover:underline font-medium">设置</Link>中配置还款日，并确保有交易记录
+              </>
+            }
+          />
         ) : (
           <div className="space-y-4">
             {cycles.map((c) => (

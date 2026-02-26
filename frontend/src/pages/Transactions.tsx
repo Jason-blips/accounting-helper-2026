@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout';
+import EmptyState from '../components/EmptyState';
 import PullToRefresh from '../components/PullToRefresh';
 import { transactionApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
@@ -93,7 +94,7 @@ export default function Transactions() {
         return;
       }
       console.error('删除失败:', error);
-      alert('删除失败，请重试');
+      toast('删除失败，请重试');
     } finally {
       setDeletingId(null);
     }
@@ -217,21 +218,18 @@ export default function Transactions() {
         </div>
 
         {Object.keys(groupedTransactions).length === 0 ? (
-          <div className="card p-12 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 mb-4">
-              <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <p className="text-gray-700 text-lg font-medium">还没有交易记录</p>
-            <p className="text-gray-500 text-sm mt-2 mb-6">记一笔收入或支出，开始打理你的账本</p>
-            <Link to="/add" className="btn-primary inline-flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              记一笔
-            </Link>
-          </div>
+          <EmptyState
+            title="还没有交易记录"
+            description="记一笔收入或支出，开始打理你的账本"
+            action={
+              <Link to="/add" className="btn-primary inline-flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                记一笔
+              </Link>
+            }
+          />
         ) : (
           <div className="space-y-6">
             {Object.entries(groupedTransactions)

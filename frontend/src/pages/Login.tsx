@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ErrorBanner from '../components/ErrorBanner';
 import { authApi } from '../services/api';
 import { setToken, setUserRole } from '../services/auth';
 
@@ -158,14 +159,7 @@ export default function Login() {
                 <span className="font-medium">{registerSuccess}</span>
               </div>
             )}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center space-x-2">
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="font-medium">{error}</span>
-              </div>
-            )}
+            {error && <ErrorBanner message={error} />}
 
             <div className="space-y-4">
               <div>
