@@ -314,8 +314,8 @@ export const adminApi = {
 export const categoriesApi = {
   list: async (): Promise<UserCategory[]> => {
     const response = await api.get('/categories');
-    const raw = response.data as unknown[];
-    return (raw ?? []).map((c: Record<string, unknown>) => ({
+    const raw = (response.data ?? []) as Record<string, unknown>[];
+    return raw.map((c) => ({
       id: c.id as number,
       userId: c.userId as number,
       name: (c.name as string) ?? '',
