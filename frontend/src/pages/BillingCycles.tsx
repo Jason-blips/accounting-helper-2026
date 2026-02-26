@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { settingsApi, billingCyclesApi } from '../services/api';
+import { billingCyclesApi } from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import { formatCurrency } from '../utils/format';
 import type { BillingCycleDto } from '../types';
-
-const TIMEZONE_OPTIONS: { value: string; label: string }[] = [
-  { value: 'Europe/London', label: '英国时间' },
-  { value: 'Asia/Shanghai', label: '北京时间' },
-];
 
 function cycleLabel(c: BillingCycleDto): string {
   const s = new Date(c.startDate + 'T12:00:00');
@@ -19,9 +14,6 @@ function cycleLabel(c: BillingCycleDto): string {
 
 export default function BillingCycles() {
   const toast = useToast();
-  const [repaymentDay, setRepaymentDay] = useState(15);
-  const [timezone, setTimezone] = useState('Europe/London');
-  const [loadingRepayment, setLoadingRepayment] = useState(true);
   const [cycles, setCycles] = useState<BillingCycleDto[]>([]);
   const [loadingCycles, setLoadingCycles] = useState(true);
   const [editingBudget, setEditingBudget] = useState<BillingCycleDto | null>(null);
@@ -31,29 +23,7 @@ export default function BillingCycles() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const [dayRes, tzRes] = await Promise.all([
-          settingsApi.getRepaymentDay(),
-          settingsApi.getTimezone(),
-        ]);
-        if (!cancelled) {
-          setRepaymentDay(dayRes.repaymentDay);
-          setTimezone(tzRes.timezone || 'Europe/London');
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        if (!cancelled) setLoadingRepayment(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
     const to = new Date();
-    // 从 2025 年 12 月开始显示周期（用户从该时间开始记账）
     const fromStr = '2025-12-01';
     const toStr = to.toISOString().slice(0, 10);
     (async () => {
@@ -68,32 +38,7 @@ export default function BillingCycles() {
       }
     })();
     return () => { cancelled = true; };
-  }, [repaymentDay]);
-
-  const handleSaveRepaymentDay = async (day: number) => {
-    const clamped = Math.max(1, Math.min(31, day));
-    try {
-      await settingsApi.setRepaymentDay(clamped);
-      setRepaymentDay(clamped);
-      toast('还款日已保存');
-    } catch (e: unknown) {
-      const err = e as { response?: { data?: { error?: string } } };
-      const msg = err.response?.data?.error || '保存失败';
-      console.error(e);
-      toast(msg);
-    }
-  };
-
-  const handleSaveTimezone = async (tz: string) => {
-    try {
-      await settingsApi.setTimezone(tz);
-      setTimezone(tz);
-      toast('时区已保存');
-    } catch (e: unknown) {
-      const err = e as { response?: { data?: { error?: string } } };
-      toast(err.response?.data?.error || '保存失败');
-    }
-  };
+  }, []);
 
   const openBudgetModal = (c: BillingCycleDto) => {
     setEditingBudget(c);
@@ -142,50 +87,11 @@ export default function BillingCycles() {
           <p className="text-gray-600 text-sm">
             按还款日划分周期，查看每期收支并设置预期，合理分配开销
           </p>
-        </div>
-
-        <div className="card p-4 space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">还款日（每月几号）</label>
-            {loadingRepayment ? (
-              <div className="spinner w-6 h-6 border-blue-600"></div>
-            ) : (
-              <div className="flex flex-wrap items-center gap-3">
-                <select
-                  value={repaymentDay}
-                  onChange={(e) => handleSaveRepaymentDay(parseInt(e.target.value, 10))}
-                  className="input-field max-w-[120px]"
-                >
-                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                    <option key={d} value={d}>
-                      每月 {d} 号
-                    </option>
-                  ))}
-                </select>
-                <span className="text-sm text-gray-500">
-                  {repaymentDay === 1
-                    ? '周期从每月 1 号至当月最后一天'
-                    : `周期从本月 ${repaymentDay} 号至下月 ${repaymentDay === 31 ? '最后一天' : `${repaymentDay - 1} 号`}`}
-                </span>
-              </div>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">时区</label>
-            {!loadingRepayment && (
-              <select
-                value={timezone}
-                onChange={(e) => handleSaveTimezone(e.target.value)}
-                className="input-field max-w-[160px]"
-              >
-                {TIMEZONE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+          <p className="text-sm text-gray-500 mt-2">
+            还款日、时区等请在
+            <Link to="/settings" className="text-blue-600 hover:underline font-medium ml-1">设置</Link>
+            中修改
+          </p>
         </div>
 
         {loadingCycles ? (
@@ -195,7 +101,7 @@ export default function BillingCycles() {
           </div>
         ) : cycles.length === 0 ? (
           <div className="card p-12 text-center text-gray-500">
-            暂无周期数据，请先设置还款日并确保有交易记录
+            <p>暂无周期数据，请先在<Link to="/settings" className="text-blue-600 hover:underline font-medium">设置</Link>中配置还款日，并确保有交易记录</p>
           </div>
         ) : (
           <div className="space-y-4">

@@ -12,6 +12,7 @@ import Performance from './pages/Performance';
 import About from './pages/About';
 import Share from './pages/Share';
 import BillingCycles from './pages/BillingCycles';
+import Settings from './pages/Settings';
 import NetworkBanner from './components/NetworkBanner';
 import ApiErrorBanner from './components/ApiErrorBanner';
 
@@ -113,6 +114,14 @@ function App() {
           element={
             <PrivateRoute>
               <BillingCycles />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <Settings />
             </PrivateRoute>
           }
         />

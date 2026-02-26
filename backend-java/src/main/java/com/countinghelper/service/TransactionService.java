@@ -5,6 +5,10 @@ import com.countinghelper.dto.response.StatsResponse;
 import com.countinghelper.entity.Transaction;
 import com.countinghelper.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,6 +113,29 @@ public class TransactionService {
         } catch (Exception e) {
             return List.of();
         }
+    }
+
+    /** 分页查询：支持 date 或 from/to，无筛选时按全部倒序 */
+    public Page<Transaction> getTransactionsPaged(Integer userId, int page, int size, String date, String from, String to) {
+        Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(100, Math.max(1, size)), Sort.by(Sort.Direction.DESC, "createdAt"));
+        if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
+            try {
+                LocalDateTime start = LocalDateTime.parse(from + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime end = LocalDateTime.parse(to + "T23:59:59", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                return transactionRepository.findByUserIdAndCreatedAtBetween(userId, start, end, pageable);
+            } catch (Exception e) {
+                return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+            }
+        }
+        if (date != null && !date.isEmpty()) {
+            try {
+                LocalDateTime.parse(date + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                return transactionRepository.findByUserIdAndDatePaged(userId, date, pageable);
+            } catch (Exception e) {
+                return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+            }
+        }
+        return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
     
     @Transactional

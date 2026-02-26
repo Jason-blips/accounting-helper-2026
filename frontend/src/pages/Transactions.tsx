@@ -7,38 +7,68 @@ import { useToast } from '../contexts/ToastContext';
 import { formatCurrency, formatDateShort, formatDateWithWeekday } from '../utils/format';
 import type { Transaction } from '../types';
 
+const PAGE_SIZE = 20;
+
 export default function Transactions() {
   const toast = useToast();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const urlFrom = searchParams.get('from') || '';
   const urlTo = searchParams.get('to') || '';
+  const pageParam = searchParams.get('page');
+  const currentPage = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [filterDate, setFilterDate] = useState('');
 
   useEffect(() => {
     loadTransactions();
-  }, [filterDate, urlFrom, urlTo]);
+  }, [currentPage, filterDate, urlFrom, urlTo]);
+
+  const goToPage = (page: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (page <= 1) next.delete('page');
+      else next.set('page', String(page));
+      return next;
+    });
+  };
+
+  const onFilterChange = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('page');
+      return next;
+    });
+  };
 
   const loadTransactions = async () => {
+    setLoading(true);
     try {
-      let data: Transaction[];
-      if (urlFrom && urlTo) {
-        data = await transactionApi.getAll(undefined, urlFrom, urlTo);
-      } else {
-        data = await transactionApi.getAll(filterDate || undefined);
-      }
-      // 检查是否有静默错误（接口可能返回错误对象）
-      const raw = data as { silent?: boolean; isTokenExpired?: boolean } | Transaction[];
-      if (raw && typeof raw === 'object' && !Array.isArray(raw) && (raw.silent || raw.isTokenExpired)) {
+      const opts =
+        urlFrom && urlTo
+          ? { from: urlFrom, to: urlTo }
+          : filterDate
+            ? { date: filterDate }
+            : undefined;
+      const result = await transactionApi.getPaged(currentPage - 1, PAGE_SIZE, opts);
+      if ((result as { silent?: boolean; isTokenExpired?: boolean })?.silent || (result as { isTokenExpired?: boolean })?.isTokenExpired) {
         return;
       }
-      setTransactions(Array.isArray(data) ? data : []);
+      setTransactions(result.content);
+      setTotalElements(result.totalElements);
+      setTotalPages(result.totalPages);
+      if (result.totalPages > 0 && currentPage > result.totalPages) {
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.set('page', String(result.totalPages));
+          return next;
+        });
+      }
     } catch (error: any) {
-      // 如果是token失效，已经被拦截器静默处理
-      if (error?.silent || error?.isTokenExpired) {
-        return;
-      }
+      if (error?.silent || error?.isTokenExpired) return;
       console.error('加载交易失败:', error);
     } finally {
       setLoading(false);
@@ -163,12 +193,18 @@ export default function Transactions() {
                   <input
                     type="date"
                     value={filterDate}
-                    onChange={(e) => setFilterDate(e.target.value)}
+                    onChange={(e) => {
+                      setFilterDate(e.target.value);
+                      onFilterChange();
+                    }}
                     className="input-field flex-1 max-w-xs"
                   />
                   {filterDate && (
                     <button
-                      onClick={() => setFilterDate('')}
+                      onClick={() => {
+                        setFilterDate('');
+                        onFilterChange();
+                      }}
                       className="btn-secondary text-sm px-3 py-2"
                     >
                       清除
@@ -344,6 +380,37 @@ export default function Transactions() {
                   </div>
                 );
               })}
+          </div>
+        )}
+
+        {totalElements > 0 && (
+          <div className="card p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-sm text-gray-600">
+              共 <strong>{totalElements}</strong> 条
+              {totalPages > 1 && (
+                <> · 第 <strong>{currentPage}</strong> / {totalPages} 页</>
+              )}
+            </span>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="btn-secondary text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  上一页
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  className="btn-secondary text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  下一页
+                </button>
+              </div>
+            )}
           </div>
         )}
         </div>

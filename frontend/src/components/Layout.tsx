@@ -163,7 +163,10 @@ export default function Layout({ children }: LayoutProps) {
                   </svg>
                 )}
               </button>
-              {/* 桌面端：关于 + 退出 */}
+              {/* 桌面端：设置 + 关于 + 退出 */}
+              <Link to="/settings" className={`hidden md:inline-flex nav-link ${isActive('/settings') ? 'active' : ''} py-2`} title="设置">
+                设置
+              </Link>
               <Link to="/about" className={`hidden md:inline-flex nav-link ${isActive('/about') ? 'active' : ''} py-2`} title="关于">
                 关于
               </Link>
@@ -218,6 +221,12 @@ export default function Layout({ children }: LayoutProps) {
                 </>
               )}
               <div className="border-t border-gray-100 my-2" />
+              <Link
+                to="/settings"
+                className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive('/settings') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+              >
+                <NavLinkContent path="/settings" label="设置" icon="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              </Link>
               <Link
                 to="/about"
                 className={`flex items-center px-5 py-4 text-base font-medium touch-target ${isActive('/about') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}

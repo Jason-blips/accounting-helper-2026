@@ -4,6 +4,7 @@ import com.countinghelper.dto.request.TransactionRequest;
 import com.countinghelper.dto.response.StatsResponse;
 import com.countinghelper.entity.Transaction;
 import com.countinghelper.service.TransactionService;
+import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +59,30 @@ public class TransactionController {
                 transactions = transactionService.getTransactions(userId, date);
             }
             return ResponseEntity.ok(transactions);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "获取交易失败"));
+        }
+    }
+
+    @GetMapping("/paged")
+    public ResponseEntity<?> getTransactionsPaged(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to) {
+        try {
+            Integer userId = getUserId(authentication);
+            Page<Transaction> result = transactionService.getTransactionsPaged(userId, page, size, date, from, to);
+            Map<String, Object> body = new HashMap<>();
+            body.put("content", result.getContent());
+            body.put("totalElements", result.getTotalElements());
+            body.put("totalPages", result.getTotalPages());
+            body.put("number", result.getNumber());
+            body.put("size", result.getSize());
+            return ResponseEntity.ok(body);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "获取交易失败"));

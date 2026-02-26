@@ -44,3 +44,11 @@ export interface BillingCycleDto {
   expectedIncome?: number | null;
   expectedExpense?: number | null;
 }
+
+export interface TransactionPage {
+  content: Transaction[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}

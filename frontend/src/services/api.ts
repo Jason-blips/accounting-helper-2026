@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken, removeToken, setUserRole } from './auth';
-import type { User, Transaction, Stats, AnalysisResponse, BillingCycleDto } from '../types';
+import type { User, Transaction, Stats, AnalysisResponse, BillingCycleDto, TransactionPage } from '../types';
 
 // In app build (Capacitor), use VITE_API_URL (e.g. https://your-api.com/api). In dev/web, default is /api (proxy).
 const api = axios.create({
@@ -175,6 +175,36 @@ export const transactionApi = {
     if (data?.silent || data?.isTokenExpired) return data;
     if (!Array.isArray(data)) return [];
     return data.map((t: Record<string, unknown>) => normalizeTransaction(t));
+  },
+  getPaged: async (
+    page: number,
+    size: number,
+    opts?: { date?: string; from?: string; to?: string }
+  ): Promise<TransactionPage> => {
+    const params: Record<string, string | number> = { page, size };
+    if (opts?.from && opts?.to) {
+      params.from = opts.from;
+      params.to = opts.to;
+    } else if (opts?.date) {
+      params.date = opts.date;
+    }
+    const response = await api.get('/transactions/paged', { params });
+    const data = response.data;
+    if (data?.silent || data?.isTokenExpired) return data;
+    const raw = data as {
+      content?: unknown[];
+      totalElements?: number;
+      totalPages?: number;
+      number?: number;
+      size?: number;
+    };
+    return {
+      content: (raw.content ?? []).map((t: Record<string, unknown>) => normalizeTransaction(t)),
+      totalElements: raw.totalElements ?? 0,
+      totalPages: raw.totalPages ?? 0,
+      number: raw.number ?? 0,
+      size: raw.size ?? size,
+    };
   },
   update: async (id: number, transaction: Partial<Transaction> & { amount?: number | string }) => {
     const response = await api.put(`/transactions/${id}`, toBackendTransactionPayload(transaction));
