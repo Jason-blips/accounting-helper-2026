@@ -35,6 +35,8 @@ export default function Login() {
   /** 注册成功后提示，并进入登录流程（不直接进主界面） */
   const [registerSuccess, setRegisterSuccess] = useState('');
   const [passwordCopied, setPasswordCopied] = useState(false);
+  /** 登录成功后是否显示「是否保存密码」提示（再进入主界面） */
+  const [loginSuccessPrompt, setLoginSuccessPrompt] = useState(false);
   const navigate = useNavigate();
 
   const handleUseRecommendedPassword = () => {
@@ -89,7 +91,7 @@ export default function Login() {
           // 忽略，角色可选
         }
       }
-      navigate('/');
+      setLoginSuccessPrompt(true);
     } catch (err: any) {
       const raw = err.response?.data?.error;
       const safe = raw === '用户名已存在' || raw === '用户名或密码错误'
@@ -117,6 +119,31 @@ export default function Login() {
             </p>
           </div>
 
+          {loginSuccessPrompt ? (
+            <div className="space-y-6">
+              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-4 rounded-lg text-center space-y-3">
+                <div className="flex justify-center">
+                  <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="font-semibold text-lg">登录成功</p>
+                <p className="text-sm text-green-700">
+                  您可在浏览器弹窗中选择「保存密码」，便于下次登录；也可使用密码管理器保存。
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginSuccessPrompt(false);
+                    navigate('/');
+                  }}
+                  className="btn-primary mt-2"
+                >
+                  进入主界面
+                </button>
+              </div>
+            </div>
+          ) : (
           <form
             className="space-y-6"
             onSubmit={handleSubmit}
@@ -156,14 +183,20 @@ export default function Login() {
               </div>
               <div>
                 <label className="label">密码</label>
-                <div className="flex gap-2">
+                {!isLogin && (
+                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2 flex items-center gap-2">
+                    <span aria-hidden className="text-amber-600">🔐</span>
+                    <span>推荐使用强密码（含大小写、数字、符号），可一键生成并保存到密码管理器</span>
+                  </p>
+                )}
+                <div className="flex gap-2 flex-wrap">
                   <input
                     type="password"
                     name="password"
                     required
                     autoComplete={isLogin ? 'current-password' : 'new-password'}
-                    className="input-field flex-1"
-                    placeholder={isLogin ? '请输入密码' : '请设置密码（建议使用推荐密码）'}
+                    className="input-field flex-1 min-w-0"
+                    placeholder={isLogin ? '请输入密码' : '请设置密码（可点击右侧生成推荐密码）'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -171,16 +204,16 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={handleUseRecommendedPassword}
-                      className="btn-secondary whitespace-nowrap px-3"
+                      className="btn-secondary whitespace-nowrap px-4 shrink-0"
                       title="生成并填充推荐强密码，并复制到剪贴板"
                     >
-                      {passwordCopied ? '已复制' : '推荐密码'}
+                      {passwordCopied ? '✓ 已复制' : '生成推荐密码'}
                     </button>
                   )}
                 </div>
                 {!isLogin && (
                   <p className="text-xs text-gray-500 mt-1">
-                    可使用推荐密码并保存到浏览器或密码管理器中
+                    生成后可保存到浏览器或密码管理器中，下次登录更方便
                   </p>
                 )}
               </div>
@@ -236,6 +269,7 @@ export default function Login() {
               </button>
             </div>
           </form>
+          )}
         </div>
       </div>
     </div>
