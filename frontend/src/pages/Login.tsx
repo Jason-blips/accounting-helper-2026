@@ -25,24 +25,25 @@ export default function Login() {
         response = await authApi.register(username, password, email);
       }
 
-      setToken(response.token);
+      const token = response?.token;
+      if (!token) {
+        setError(isLogin ? '登录失败' : '注册失败');
+        return;
+      }
+      setToken(token);
       if (response.user?.role) {
         setUserRole(response.user.role);
-        console.log('用户角色已保存:', response.user.role);
       } else {
-        // 如果登录响应中没有角色，从API获取
         try {
           const userInfo = await authApi.getMe();
-          if (userInfo.role) {
-            setUserRole(userInfo.role);
-            console.log('从API获取用户角色:', userInfo.role);
-          }
-        } catch (err) {
-          console.error('获取用户信息失败:', err);
+          if (userInfo?.role) setUserRole(userInfo.role);
+        } catch {
+          // 忽略，角色可选
         }
       }
       navigate('/');
     } catch (err: any) {
+      // 后端登录失败返回 400 + error；注册失败 400；其他 401 等也统一显示文案
       const raw = err.response?.data?.error;
       const safe = raw === '用户名已存在' || raw === '用户名或密码错误'
         ? raw

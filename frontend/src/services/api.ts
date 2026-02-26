@@ -7,18 +7,29 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
-// 请求拦截器：添加token
+// 公开路径（无需 token）
+const isPublicPath = (url: string) => {
+  const u = (url || '').split('?')[0];
+  return /\/auth\/(login|register)$/.test(u) || u.includes('/health') || u.includes('/currency/convert');
+};
+
+// 请求拦截器：添加 token；无 token 时对需认证接口直接重定向，避免必然的 401
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    }
+    const url = [config.baseURL, config.url].filter(Boolean).join('').replace(api.defaults.baseURL || '', '') || (config.url as string) || '';
+    if (!isPublicPath(url) && typeof window !== 'undefined' && window.location.pathname !== '/login') {
+      removeToken();
+      window.location.replace('/login');
+      return Promise.reject(new Error('TOKEN_MISSING'));
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // 响应拦截器：处理错误，静默处理token失效

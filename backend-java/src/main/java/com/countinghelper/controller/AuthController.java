@@ -39,9 +39,9 @@ public class AuthController {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            // 仅返回对用户友好的文案，不暴露数据库等原始报错
+            // 仅返回对用户友好的文案；用 400 避免浏览器把登录失败当成 401 未认证
             String msg = "用户名或密码错误".equals(e.getMessage()) ? e.getMessage() : "登录失败";
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", msg));
         }
     }
