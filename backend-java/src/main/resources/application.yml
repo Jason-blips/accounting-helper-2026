@@ -60,3 +60,5 @@ logging:
     org.springframework.security: INFO
     org.hibernate: INFO
     org.springframework.boot: INFO
+    # 避免 /favicon.ico 等请求触发的一次性 HandlerMapping 缓存未命中 WARN
+    org.springframework.web.servlet.handler.HandlerMappingIntrospector: ERROR

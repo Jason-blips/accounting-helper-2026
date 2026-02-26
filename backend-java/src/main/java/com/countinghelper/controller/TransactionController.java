@@ -4,6 +4,7 @@ import com.countinghelper.dto.request.TransactionRequest;
 import com.countinghelper.dto.response.StatsResponse;
 import com.countinghelper.entity.Transaction;
 import com.countinghelper.service.TransactionExportService;
+import com.countinghelper.service.TransactionImportService;
 import com.countinghelper.service.TransactionService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +32,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionExportService transactionExportService;
+
+    @Autowired
+    private TransactionImportService transactionImportService;
     
     private Integer getUserId(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -157,6 +162,33 @@ public class TransactionController {
         }
     }
     
+    /** 导入交易：上传 CSV 文件，格式与导出一致（日期,类型,金额,货币,支付方式,分类,描述） */
+    @PostMapping("/import")
+    public ResponseEntity<?> importTransactions(
+            Authentication authentication,
+            @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "请选择 CSV 文件"));
+        }
+        String name = file.getOriginalFilename();
+        if (name == null || !name.toLowerCase().endsWith(".csv")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "仅支持 .csv 文件"));
+        }
+        try {
+            Integer userId = getUserId(authentication);
+            byte[] bytes = file.getBytes();
+            TransactionImportService.ImportResult result = transactionImportService.importCsvForUser(userId, bytes);
+            Map<String, Object> body = new HashMap<>();
+            body.put("imported", result.imported);
+            body.put("failed", result.failed);
+            body.put("errors", result.errors);
+            return ResponseEntity.ok(body);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "导入失败：" + e.getMessage()));
+        }
+    }
+
     /** 导出交易：format=csv|excel，from/to 可选日期范围（YYYY-MM-DD），不传则导出全部 */
     @GetMapping("/export")
     public ResponseEntity<?> exportTransactions(

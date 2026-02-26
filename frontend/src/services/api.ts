@@ -259,6 +259,20 @@ export const transactionApi = {
     a.click();
     URL.revokeObjectURL(url);
   },
+  /** 从 CSV 导入交易，格式与导出一致。返回 { imported, failed, errors } */
+  importCsv: async (file: File): Promise<{ imported: number; failed: number; errors: string[] }> => {
+    const form = new FormData();
+    form.append('file', file);
+    const response = await api.post('/transactions/import', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    const data = response.data as { imported?: number; failed?: number; errors?: string[] };
+    return {
+      imported: data.imported ?? 0,
+      failed: data.failed ?? 0,
+      errors: Array.isArray(data.errors) ? data.errors : [],
+    };
+  },
 };
 
 export const statsApi = {

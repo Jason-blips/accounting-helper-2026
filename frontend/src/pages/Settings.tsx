@@ -64,6 +64,27 @@ export default function Settings() {
     }
   };
 
+  const handleImport = async () => {
+    if (!importFile) {
+      toast('请先选择 CSV 文件');
+      return;
+    }
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const result = await transactionApi.importCsv(importFile);
+      setImportResult(result);
+      if (result.imported > 0) toast(`已导入 ${result.imported} 条`);
+      if (result.failed > 0 && result.errors.length > 0) toast(`有 ${result.failed} 条导入失败`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      toast(err.message || '导入失败');
+    } finally {
+      setImporting(false);
+      setImportFile(null);
+    }
+  };
+
   const handleExport = async () => {
     const from = exportFrom.trim() || undefined;
     const to = exportTo.trim() || undefined;
@@ -179,7 +200,7 @@ export default function Settings() {
                 时区
               </h2>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">当前时区</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--theme-text)' }}>当前时区</label>
                 <select
                   value={timezone}
                   onChange={(e) => handleSaveTimezone(e.target.value)}
@@ -198,11 +219,61 @@ export default function Settings() {
             <section>
               <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
                 <svg className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 16m4-4v4" />
+                </svg>
+                数据导入
+              </h2>
+              <p className="text-sm mb-3" style={{ color: 'var(--theme-text-muted)' }}>上传 CSV，格式与导出一致：日期,类型,金额,货币,支付方式,分类,描述（首行为表头）</p>
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <label htmlFor="import-csv" className="sr-only">选择 CSV 文件</label>
+                  <input
+                    id="import-csv"
+                    type="file"
+                    accept=".csv"
+                    className="text-sm"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      setImportFile(f ?? null);
+                      setImportResult(null);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleImport}
+                    disabled={importing || !importFile}
+                    className="btn-primary"
+                    aria-label="导入 CSV"
+                  >
+                    {importing ? '导入中...' : '导入'}
+                  </button>
+                </div>
+                {importResult && (
+                  <div className="text-sm rounded-lg p-3 border" style={{ borderColor: 'var(--theme-border)', color: 'var(--theme-text)' }}>
+                    <p>成功导入 {importResult.imported} 条，失败 {importResult.failed} 条</p>
+                    {importResult.errors.length > 0 && (
+                      <ul className="mt-2 list-disc list-inside text-red-600 dark:text-red-400">
+                        {importResult.errors.slice(0, 10).map((msg, i) => (
+                          <li key={i}>{msg}</li>
+                        ))}
+                        {importResult.errors.length > 10 && (
+                          <li>… 还有 {importResult.errors.length - 10} 条错误</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--theme-text)' }}>
+                <svg className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 数据导出
               </h2>
-              <p className="text-sm text-gray-500 mb-3">将交易记录导出为 CSV 或 Excel，可选日期范围（留空则导出全部）</p>
+              <p className="text-sm mb-3" style={{ color: 'var(--theme-text-muted)' }}>将交易记录导出为 CSV 或 Excel，可选日期范围（留空则导出全部）</p>
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-4">
                   <div>
@@ -218,7 +289,7 @@ export default function Settings() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="export-from">开始日期</label>
+                    <label className="block text-sm font-medium mb-1" htmlFor="export-from" style={{ color: 'var(--theme-text)' }}>开始日期</label>
                     <input
                       id="export-from"
                       type="date"
