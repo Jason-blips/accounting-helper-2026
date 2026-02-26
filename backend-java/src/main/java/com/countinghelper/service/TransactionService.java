@@ -91,6 +91,12 @@ public class TransactionService {
         return transaction;
     }
     
+    /** 按 id 获取单条交易（仅限当前用户） */
+    public Transaction getTransactionById(Integer userId, Integer transactionId) {
+        return transactionRepository.findByIdAndUserId(transactionId, userId)
+            .orElseThrow(() -> new RuntimeException("交易不存在"));
+    }
+
     public List<Transaction> getTransactions(Integer userId, String date) {
         if (date != null && !date.isEmpty()) {
             try {

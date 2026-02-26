@@ -176,6 +176,12 @@ export const transactionApi = {
     if (!Array.isArray(data)) return [];
     return data.map((t: Record<string, unknown>) => normalizeTransaction(t));
   },
+  getById: async (id: number): Promise<Transaction> => {
+    const response = await api.get(`/transactions/${id}`);
+    const data = response.data;
+    if (data?.silent || data?.isTokenExpired) return data;
+    return normalizeTransaction(data as Record<string, unknown>);
+  },
   getPaged: async (
     page: number,
     size: number,

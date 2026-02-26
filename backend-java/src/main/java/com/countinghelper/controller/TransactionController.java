@@ -88,6 +88,24 @@ public class TransactionController {
                 .body(Map.of("error", "获取交易失败"));
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTransaction(
+            Authentication authentication,
+            @PathVariable Integer id) {
+        try {
+            Integer userId = getUserId(authentication);
+            Transaction transaction = transactionService.getTransactionById(userId, id);
+            return ResponseEntity.ok(transaction);
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("交易不存在")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "获取交易失败"));
+        }
+    }
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updateTransaction(

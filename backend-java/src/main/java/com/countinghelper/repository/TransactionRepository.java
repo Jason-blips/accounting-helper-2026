@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
@@ -34,7 +35,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query("SELECT t FROM Transaction t WHERE t.userId = :userId AND t.createdAt >= :start ORDER BY t.createdAt DESC")
     List<Transaction> findByUserIdAndCreatedAtAfter(@Param("userId") Integer userId, @Param("start") LocalDateTime start);
     
+    Optional<Transaction> findByIdAndUserId(Integer id, Integer userId);
+
     boolean existsByIdAndUserId(Integer id, Integer userId);
-    
+
     void deleteByIdAndUserId(Integer id, Integer userId);
 }

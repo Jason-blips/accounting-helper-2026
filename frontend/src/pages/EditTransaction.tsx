@@ -28,25 +28,32 @@ export default function EditTransaction() {
   }, [id]);
 
   const loadTransaction = async () => {
+    const numId = parseInt(id || '0', 10);
+    if (!numId) {
+      setError('无效的交易 ID');
+      setLoading(false);
+      return;
+    }
     try {
-      const transactions = await transactionApi.getAll();
-      const found = transactions.find(t => t.id === parseInt(id || '0'));
-      if (found) {
-        setTransaction(found);
-        setFormData({
-          amount: found.amount.toString(),
-          currency: found.currency,
-          description: found.description || '',
-          category: found.category || '',
-          payment_method: found.payment_method,
-          transaction_type: found.transaction_type,
-          created_at: found.created_at.split('T')[0],
-        });
-      } else {
-        setError('交易不存在');
-      }
+      const found = await transactionApi.getById(numId);
+      setTransaction(found);
+      setFormData({
+        amount: found.amount.toString(),
+        currency: found.currency,
+        description: found.description || '',
+        category: found.category || '',
+        payment_method: found.payment_method,
+        transaction_type: found.transaction_type,
+        created_at: found.created_at.split('T')[0],
+      });
     } catch (err: any) {
-      setError('加载失败，请重试');
+      if (err?.response?.status === 404) {
+        setError('交易不存在');
+      } else if (err?.silent || err?.isTokenExpired) {
+        return;
+      } else {
+        setError(err?.response?.data?.error || '加载失败，请重试');
+      }
     } finally {
       setLoading(false);
     }
