@@ -94,4 +94,4 @@ VITE_PRIVACY_URL=https://yourdomain.com/privacy
 
 - **versionName**：在 `frontend/android/app/build.gradle` 的 `defaultConfig.versionName` 中设置（如 `"1.0.0"`）。  
 - **versionCode**：每次上传新包时递增 `versionCode`（如 1, 2, 3…）。  
-- **applicationId**：`com.countinghelper.app`（与 `capacitor.config.ts` 中 `appId` 一致）。
+- **applicationId**：`com.tallydrop.app`（与 `capacitor.config.ts` 中 `appId` 一致）。

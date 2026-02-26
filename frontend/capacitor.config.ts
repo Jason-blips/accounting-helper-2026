@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.countinghelper.app',
+  appId: 'com.tallydrop.app',
   appName: 'Tally Drop 落记',
   webDir: 'dist',
   plugins: {
