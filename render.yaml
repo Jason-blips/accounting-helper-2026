@@ -1,0 +1,8 @@
+# Render Blueprint（可选）：Web Service 推荐配置
+# 若在 Dashboard 手动创建服务，请在 Settings → Health Check Path 填：/api/health
+
+services:
+  - type: web
+    name: counting-helper-backend
+    # 健康检查路径：GET 返回 2xx 即视为就绪，必须与后端一致
+    healthCheckPath: /api/health
