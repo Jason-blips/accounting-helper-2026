@@ -114,6 +114,7 @@ export default function Share() {
   const toast = useToast();
   const [searchParams] = useSearchParams();
   const cardRef = useRef<HTMLDivElement>(null);
+  const captureRef = useRef<HTMLDivElement>(null);
   const urlPeriod = searchParams.get('period');
   const urlFrom = searchParams.get('from') || '';
   const urlTo = searchParams.get('to') || '';
@@ -180,29 +181,33 @@ export default function Share() {
         ? buildMonthBars(transactions, dateFrom, dateTo)
         : [];
 
-  const handleGenerate = async () => {
-    const node = cardRef.current;
-    if (!node) {
-      toast('无法生成图片');
-      return;
-    }
-    setGenerating(true);
+  const handleGenerate = () => {
     setImageDataUrl(null);
-    try {
-      const dataUrl = await toPng(node, {
+    setGenerating(true);
+  };
+
+  // 生成长图：用隐藏的「完整版」卡片截图，避免明细被 max-height 截断
+  useEffect(() => {
+    if (!generating || !captureRef.current) return;
+    const el = captureRef.current;
+    const timer = setTimeout(() => {
+      toPng(el, {
         pixelRatio: 2,
         cacheBust: true,
         backgroundColor: '#ffffff',
-      });
-      setImageDataUrl(dataUrl);
-      toast('图片已生成');
-    } catch (e) {
-      console.error(e);
-      toast('生成失败，请重试');
-    } finally {
-      setGenerating(false);
-    }
-  };
+      })
+        .then((dataUrl) => {
+          setImageDataUrl(dataUrl);
+          toast('图片已生成');
+        })
+        .catch((e) => {
+          console.error(e);
+          toast('生成失败，请重试');
+        })
+        .finally(() => setGenerating(false));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [generating, toast]);
 
   const downloadFilename =
     period === 'day'
@@ -344,6 +349,33 @@ export default function Share() {
           </div>
         ) : (
           <>
+            {/* 用于截图的完整长图卡片：放屏幕外、无高度限制，生成时渲染 */}
+            {generating && (
+              <div
+                ref={captureRef}
+                className="flex justify-center"
+                style={{
+                  position: 'fixed',
+                  left: '-9999px',
+                  top: 0,
+                  zIndex: -1,
+                  width: 380,
+                }}
+              >
+                <ShareCard
+                  date={dateTo}
+                  dateFrom={period === 'day' ? undefined : dateFrom}
+                  period={period}
+                  stats={stats}
+                  transactions={period === 'day' ? transactions : []}
+                  chartBars={chartBars}
+                  expectedIncome={period === 'cycle' ? cycleExpected.income : undefined}
+                  expectedExpense={period === 'cycle' ? cycleExpected.expense : undefined}
+                  width={380}
+                  forImage
+                />
+              </div>
+            )}
             <div className="flex justify-center">
               <div ref={cardRef} className="flex justify-center">
                 <ShareCard

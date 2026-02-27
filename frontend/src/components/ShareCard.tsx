@@ -32,6 +32,8 @@ interface ShareCardProps {
   expectedIncome?: number | null;
   expectedExpense?: number | null;
   width?: number;
+  /** 为生成分享长图：明细不截断、无最大高度，展示全部条目 */
+  forImage?: boolean;
 }
 
 function DonutChart({ income, expense }: { income: number; expense: number }) {
@@ -134,6 +136,9 @@ function BarsChart({ items }: { items: ChartBarItem[] }) {
   );
 }
 
+const MAX_LIST_PREVIEW = 12;
+const MAX_LIST_IMAGE = 200;
+
 export default function ShareCard({
   date,
   dateFrom,
@@ -144,8 +149,11 @@ export default function ShareCard({
   expectedIncome,
   expectedExpense,
   width = 380,
+  forImage = false,
 }: ShareCardProps) {
-  const displayList = transactions.slice(0, 12);
+  const displayList = forImage
+    ? transactions.slice(0, MAX_LIST_IMAGE)
+    : transactions.slice(0, MAX_LIST_PREVIEW);
   const isDay = period === 'day';
   const isCycle = period === 'cycle';
   const isToday =
@@ -276,7 +284,9 @@ export default function ShareCard({
           {displayList.length === 0 ? (
             <div className="text-sm text-gray-400 py-4 text-center">当日暂无记录</div>
           ) : (
-            <div className="space-y-1.5 max-h-48 overflow-hidden">
+            <div
+              className={`space-y-1.5 ${forImage ? '' : 'max-h-48 overflow-hidden'}`}
+            >
               {displayList.map((t) => (
                 <div
                   key={t.id}
@@ -306,9 +316,14 @@ export default function ShareCard({
               ))}
             </div>
           )}
-          {transactions.length > displayList.length && (
+          {!forImage && transactions.length > displayList.length && (
             <div className="text-xs text-gray-400 mt-2 text-center">
               共 {transactions.length} 笔，仅展示前 {displayList.length} 笔
+            </div>
+          )}
+          {forImage && transactions.length > MAX_LIST_IMAGE && (
+            <div className="text-xs text-gray-400 mt-2 text-center">
+              共 {transactions.length} 笔，仅展示前 {MAX_LIST_IMAGE} 笔
             </div>
           )}
         </div>
