@@ -193,15 +193,15 @@ export default function Dashboard() {
         <div className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 flex flex-wrap items-center gap-2 sm:space-x-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-theme mb-2 flex flex-wrap items-center gap-2 sm:space-x-3">
               <span>财务概览</span>
               {isUserAdmin && (
-                <span className="px-3 py-1 text-sm font-semibold bg-purple-100 text-purple-700 rounded-full border border-purple-200">
+                <span className="px-3 py-1 text-sm font-semibold rounded-full border" style={{ backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)', borderColor: 'var(--theme-primary)' }}>
                   管理员
                 </span>
               )}
             </h1>
-            <p className="text-gray-600">查看您的收入和支出统计</p>
+            <p className="text-theme-muted">查看您的收入和支出统计</p>
           </div>
           <Link
             to="/share"
@@ -216,33 +216,33 @@ export default function Dashboard() {
 
         {/* 管理员快速访问卡片 */}
         {isUserAdmin && (
-          <div className="card p-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200">
+          <div className="card p-6 border-2 border-theme" style={{ backgroundColor: 'var(--theme-surface-hover)' }}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center space-x-2">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h2 className="text-2xl font-bold text-theme mb-2 flex items-center space-x-2">
+                  <svg className="w-6 h-6" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                   <span>管理员控制台</span>
                 </h2>
-                <p className="text-gray-700 mb-4">管理系统用户和查看系统统计信息</p>
+                <p className="text-theme-muted mb-4">管理系统用户和查看系统统计信息</p>
                 {adminStats && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="bg-white/80 rounded-lg p-3 border border-purple-200">
-                      <div className="text-xs font-semibold text-gray-500 mb-1">总用户数</div>
-                      <div className="text-2xl font-bold text-purple-600">{adminStats.total_users}</div>
+                    <div className="bg-theme-surface rounded-lg p-3 border border-theme">
+                      <div className="text-xs font-semibold text-theme-muted mb-1">总用户数</div>
+                      <div className="text-2xl font-bold text-theme">{adminStats.total_users}</div>
                     </div>
-                    <div className="bg-white/80 rounded-lg p-3 border border-purple-200">
-                      <div className="text-xs font-semibold text-gray-500 mb-1">管理员</div>
-                      <div className="text-2xl font-bold text-purple-600">{adminStats.admin_count}</div>
+                    <div className="bg-theme-surface rounded-lg p-3 border border-theme">
+                      <div className="text-xs font-semibold text-theme-muted mb-1">管理员</div>
+                      <div className="text-2xl font-bold text-theme">{adminStats.admin_count}</div>
                     </div>
-                    <div className="bg-white/80 rounded-lg p-3 border border-purple-200">
-                      <div className="text-xs font-semibold text-gray-500 mb-1">普通用户</div>
-                      <div className="text-2xl font-bold text-green-600">{adminStats.user_count}</div>
+                    <div className="bg-theme-surface rounded-lg p-3 border border-theme">
+                      <div className="text-xs font-semibold text-theme-muted mb-1">普通用户</div>
+                      <div className="text-2xl font-bold text-theme">{adminStats.user_count}</div>
                     </div>
-                    <div className="bg-white/80 rounded-lg p-3 border border-purple-200">
-                      <div className="text-xs font-semibold text-gray-500 mb-1">总交易数</div>
-                      <div className="text-2xl font-bold text-blue-600">{adminStats.total_transactions}</div>
+                    <div className="bg-theme-surface rounded-lg p-3 border border-theme">
+                      <div className="text-xs font-semibold text-theme-muted mb-1">总交易数</div>
+                      <div className="text-2xl font-bold text-theme">{adminStats.total_transactions}</div>
                     </div>
                   </div>
                 )}
@@ -269,11 +269,11 @@ export default function Dashboard() {
                 </svg>
               </div>
             </div>
-            <div className="text-sm font-semibold text-gray-500 mb-1 uppercase tracking-wide">总收入</div>
+            <div className="text-sm font-semibold text-theme-muted mb-1 uppercase tracking-wide">总收入</div>
             <div className="text-4xl font-bold text-green-600 mb-2">
               {formatCurrency(parseFloat(stats.income), 'GBP')}
             </div>
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="flex items-center text-sm text-theme-muted">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -289,11 +289,11 @@ export default function Dashboard() {
                 </svg>
               </div>
             </div>
-            <div className="text-sm font-semibold text-gray-500 mb-1 uppercase tracking-wide">总支出</div>
+            <div className="text-sm font-semibold text-theme-muted mb-1 uppercase tracking-wide">总支出</div>
             <div className="text-4xl font-bold text-red-600 mb-2">
               {formatCurrency(parseFloat(stats.expense), 'GBP')}
             </div>
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="flex items-center text-sm text-theme-muted">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -313,13 +313,13 @@ export default function Dashboard() {
                 </svg>
               </div>
             </div>
-            <div className="text-sm font-semibold text-gray-500 mb-1 uppercase tracking-wide">余额</div>
+            <div className="text-sm font-semibold text-theme-muted mb-1 uppercase tracking-wide">余额</div>
             <div className={`text-4xl font-bold mb-2 ${
               parseFloat(stats.balance) >= 0 ? 'text-green-600' : 'text-red-600'
             }`}>
               {formatCurrency(parseFloat(stats.balance), 'GBP')}
             </div>
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="flex items-center text-sm text-theme-muted">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
@@ -332,13 +332,13 @@ export default function Dashboard() {
         <div className="card p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1 flex items-center space-x-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h2 className="text-2xl font-bold text-theme mb-1 flex items-center space-x-2">
+                <svg className="w-6 h-6" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 <span>收支趋势</span>
               </h2>
-              <p className="text-gray-600 text-sm mt-1">查看您的收入和支出变化趋势</p>
+              <p className="text-theme-muted text-sm mt-1">查看您的收入和支出变化趋势</p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-200">
@@ -440,7 +440,7 @@ export default function Dashboard() {
                 </svg>
                 <span>余额趋势</span>
               </h2>
-              <p className="text-gray-600 text-sm mt-1">查看您的账户余额变化</p>
+              <p className="text-theme-muted text-sm mt-1">查看您的账户余额变化</p>
             </div>
           </div>
           {chartData.length > 0 ? (

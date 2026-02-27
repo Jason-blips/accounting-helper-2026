@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 const DEFAULT_ICON = (
-  <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+  <svg className="w-10 h-10" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
   </svg>
 );
@@ -30,12 +30,12 @@ export default function EmptyState({
       role="status"
       aria-label={title}
     >
-      <div className={`inline-flex items-center justify-center rounded-full bg-blue-50 mb-4 ${compact ? 'w-14 h-14' : 'w-20 h-20'}`}>
+      <div className={`inline-flex items-center justify-center rounded-full mb-4 ${compact ? 'w-14 h-14' : 'w-20 h-20'}`} style={{ backgroundColor: 'var(--theme-primary-soft)' }}>
         {icon}
       </div>
-      <p className="text-gray-700 text-lg font-medium">{title}</p>
+      <p className="text-theme text-lg font-medium">{title}</p>
       {description && (
-        <p className={`text-gray-500 mt-2 text-sm ${action ? 'mb-6' : ''}`}>{description}</p>
+        <p className={`text-theme-muted mt-2 text-sm ${action ? 'mb-6' : ''}`}>{description}</p>
       )}
       {!description && action && <div className="mt-6" />}
       {action && <div className={description ? '' : 'mt-6'}>{action}</div>}

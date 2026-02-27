@@ -9,6 +9,15 @@ export const setToken = (token: string): void => {
 export const removeToken = (): void => {
   localStorage.removeItem('token');
   localStorage.removeItem('userRole');
+  localStorage.removeItem('username');
+};
+
+export const getUsername = (): string | null => {
+  return localStorage.getItem('username');
+};
+
+export const setUsername = (username: string): void => {
+  localStorage.setItem('username', username);
 };
 
 export const isAuthenticated = (): boolean => {

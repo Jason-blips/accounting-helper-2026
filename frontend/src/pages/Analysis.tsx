@@ -47,8 +47,8 @@ export default function Analysis() {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">AI分析</h1>
-            <p className="text-gray-600">智能分析您的财务数据并提供建议</p>
+            <h1 className="text-4xl font-bold text-theme mb-2">AI分析</h1>
+            <p className="text-theme-muted">智能分析您的财务数据并提供建议</p>
           </div>
           <div className="flex items-center space-x-3">
             <select
@@ -88,13 +88,13 @@ export default function Analysis() {
         </div>
 
         {error && (
-          <div className="card p-4 bg-yellow-50 border-yellow-200">
+          <div className="card p-4 border-theme bg-theme-surface-hover">
             <div className="flex items-start space-x-3">
-              <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div className="flex-1">
-                <p className="text-yellow-800 font-medium">{error}</p>
+                <p className="text-theme font-medium">{error}</p>
               </div>
             </div>
           </div>
@@ -103,23 +103,23 @@ export default function Analysis() {
         {loading && !analysis ? (
           <div className="card p-12 text-center">
             <div className="spinner w-16 h-16 mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg font-medium">AI正在分析您的财务数据...</p>
-            <p className="text-gray-500 text-sm mt-2">这可能需要几秒钟</p>
+            <p className="text-theme-muted text-lg font-medium">AI正在分析您的财务数据...</p>
+            <p className="text-theme-muted text-sm mt-2">这可能需要几秒钟</p>
           </div>
         ) : analysis ? (
           <div className="card p-8">
-            <div className="flex items-center space-x-2 mb-6 pb-4 border-b border-gray-200">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center space-x-2 mb-6 pb-4 border-b border-theme">
+              <div className="p-2 rounded-lg bg-theme-surface-hover">
+                <svg className="w-6 h-6" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">AI分析报告</h2>
-                <p className="text-sm text-gray-500">基于您的交易数据生成</p>
+                <h2 className="text-xl font-bold text-theme">AI分析报告</h2>
+                <p className="text-sm text-theme-muted">基于您的交易数据生成</p>
               </div>
             </div>
-            <div className="prose max-w-none whitespace-pre-wrap text-gray-700 leading-relaxed">
+            <div className="prose max-w-none whitespace-pre-wrap leading-relaxed text-theme">
               {analysis}
             </div>
           </div>

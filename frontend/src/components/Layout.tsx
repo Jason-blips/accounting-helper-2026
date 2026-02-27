@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { removeToken, isAdmin, getUserRole } from '../services/auth';
+import { removeToken, isAdmin, getUserRole, getUsername, setUsername } from '../services/auth';
 import { authApi } from '../services/api';
 import BottomNav from './BottomNav';
 
@@ -21,40 +21,43 @@ export default function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [userRole, setUserRole] = useState<'user' | 'admin' | null>(null);
+  const [username, setUsernameState] = useState<string | null>(() => getUsername());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // 先使用localStorage中的角色（快速显示）
+    // 先使用localStorage中的角色和用户名（快速显示）
     const cachedRole = getUserRole();
     if (cachedRole) {
       setUserRole(cachedRole);
       console.log('📦 [Layout] 使用缓存角色:', cachedRole);
     }
-    
-    // 只在有token时才从API获取最新角色
+    const cachedName = getUsername();
+    if (cachedName) setUsernameState(cachedName);
+
+    // 只在有token时才从API获取最新角色和用户名
     const token = localStorage.getItem('token');
     if (!token) {
-      // 没有token，不调用API
       return;
     }
-    
-    // 然后从API获取最新角色（确保准确性）
-    const loadUserRole = async () => {
+
+    const loadUser = async () => {
       try {
         const user = await authApi.getMe();
-        // 如果返回null（token失效被静默处理），不更新角色
         if (!user || (user as any).silent || (user as any).isTokenExpired) {
           return;
         }
         console.log('🔍 [Layout] API返回用户信息:', user);
         if (user.role) {
           setUserRole(user.role);
-          // 同时更新localStorage
           const { setUserRole: saveRole } = await import('../services/auth');
           saveRole(user.role);
           console.log('✅ [Layout] 用户角色已更新为:', user.role);
         } else {
           console.warn('⚠️ [Layout] 用户信息中没有角色字段');
+        }
+        if (user.username) {
+          setUsernameState(user.username);
+          setUsername(user.username);
         }
       } catch (error: any) {
         // 如果是静默处理的错误，不记录
@@ -66,8 +69,8 @@ export default function Layout({ children }: LayoutProps) {
       }
     };
     
-    loadUserRole();
-  }, [location.pathname]); // 当路由变化时重新检查
+    loadUser();
+  }, [location.pathname]);
 
   const handleLogout = () => {
     if (window.confirm('确定要退出登录吗？')) {
@@ -180,7 +183,12 @@ export default function Layout({ children }: LayoutProps) {
                   </svg>
                 )}
               </button>
-              {/* 桌面端：设置 + 关于 + 退出 */}
+              {/* 桌面端：用户名 + 设置 + 关于 + 退出 */}
+              {username && (
+                <span className="hidden md:inline-block px-3 py-2 text-sm truncate max-w-[8rem]" style={{ color: 'var(--theme-text-muted)' }} title={username}>
+                  {username}
+                </span>
+              )}
               <Link to="/settings" className={`hidden md:inline-flex nav-link ${isActive('/settings') ? 'active' : ''} py-2`} title="设置">
                 设置
               </Link>
@@ -216,6 +224,12 @@ export default function Layout({ children }: LayoutProps) {
             style={{ backgroundColor: 'var(--theme-surface)', borderColor: 'var(--theme-border)' }}
           >
             <div className="py-2">
+              {username && (
+                <div className="px-5 py-3 border-b" style={{ borderColor: 'var(--theme-border)' }}>
+                  <p className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>当前用户</p>
+                  <p className="font-medium truncate" style={{ color: 'var(--theme-text)' }}>{username}</p>
+                </div>
+              )}
               {navItems.map(({ path, label, icon }) => (
                 <Link
                   key={path}

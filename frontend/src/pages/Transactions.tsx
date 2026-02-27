@@ -166,7 +166,7 @@ export default function Transactions() {
       <Layout>
         <div className="flex items-center justify-center py-20">
           <div className="spinner w-12 h-12"></div>
-          <span className="ml-4 text-gray-600 text-lg">加载中...</span>
+          <span className="ml-4 text-theme-muted text-lg">加载中...</span>
         </div>
       </Layout>
     );
@@ -178,8 +178,8 @@ export default function Transactions() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">交易记录</h1>
-            <p className="text-gray-600">查看和管理您的所有交易</p>
+            <h1 className="text-4xl font-bold text-theme mb-2">交易记录</h1>
+            <p className="text-theme-muted">查看和管理您的所有交易</p>
           </div>
           <Link
             to="/add"
@@ -203,7 +203,7 @@ export default function Transactions() {
             <div className="flex items-center space-x-2 flex-1 flex-wrap">
               {urlFrom && urlTo ? (
                 <>
-                  <span className="text-gray-700">{urlFrom} 至 {urlTo}</span>
+                  <span className="text-theme">{urlFrom} 至 {urlTo}</span>
                   <Link to="/transactions" className="btn-secondary text-sm px-3 py-2">清除</Link>
                 </>
               ) : (
@@ -255,7 +255,7 @@ export default function Transactions() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">类型</label>
+              <label className="block text-xs font-medium text-theme-muted mb-1">类型</label>
               <select
                 value={filterType}
                 onChange={(e) => { setFilterType(e.target.value); onFilterChange(); }}
@@ -267,7 +267,7 @@ export default function Transactions() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">支付方式</label>
+              <label className="block text-xs font-medium text-theme-muted mb-1">支付方式</label>
               <select
                 value={filterPayment}
                 onChange={(e) => { setFilterPayment(e.target.value); onFilterChange(); }}
@@ -291,7 +291,7 @@ export default function Transactions() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">关键词（描述/分类）</label>
+              <label className="block text-xs font-medium text-theme-muted mb-1">关键词（描述/分类）</label>
               <input
                 type="text"
                 value={filterKeyword}

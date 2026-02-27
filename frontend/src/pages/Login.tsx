@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ErrorBanner from '../components/ErrorBanner';
 import { authApi } from '../services/api';
-import { setToken, setUserRole } from '../services/auth';
+import { setToken, setUserRole, setUsername as saveUsernameToStorage } from '../services/auth';
 
 /** 生成推荐的长难复杂密码（含大小写、数字、符号） */
 function generateStrongPassword(): string {
@@ -82,11 +82,13 @@ export default function Login() {
         return;
       }
       setToken(token);
+      if (response.user?.username) saveUsernameToStorage(response.user.username);
       if (response.user?.role) {
         setUserRole(response.user.role);
       } else {
         try {
           const userInfo = await authApi.getMe();
+          if (userInfo?.username) saveUsernameToStorage(userInfo.username);
           if (userInfo?.role) setUserRole(userInfo.role);
         } catch {
           // 忽略，角色可选
@@ -109,14 +111,18 @@ export default function Login() {
       <div className="max-w-md w-full">
         <div className="card p-8 space-y-8">
           <div className="text-center">
+            <p className="text-sm font-medium text-indigo-600 mb-3">欢迎使用 Tally Drop 落记</p>
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4">
               <span className="text-3xl">💰</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               {isLogin ? '欢迎回来' : '创建账号'}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-1">
               {isLogin ? '登录您的账户以继续' : '注册新账户开始使用'}
+            </p>
+            <p className="text-sm text-gray-500 italic">
+              Track your income and expenses—simply.
             </p>
           </div>
 

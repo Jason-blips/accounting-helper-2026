@@ -86,8 +86,8 @@ export default function AddTransaction() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">添加交易</h1>
-          <p className="text-gray-600">记录您的收入和支出</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-theme mb-2">添加交易</h1>
+          <p className="text-theme-muted">记录您的收入和支出</p>
         </div>
 
         {error && <ErrorBanner message={error} />}
@@ -197,7 +197,7 @@ export default function AddTransaction() {
                 <button
                   type="button"
                   onClick={() => setShowMoreOptions(true)}
-                  className="w-full py-3 text-sm font-medium text-blue-600 border border-dashed border-blue-200 rounded-xl hover:bg-blue-50 transition-colors touch-target"
+                  className="w-full py-3 text-sm font-medium link-theme border border-dashed border-theme rounded-xl bg-theme-surface hover:bg-theme-surface-hover transition-colors touch-target"
                 >
                   + 添加分类与描述（可选）
                 </button>
@@ -208,7 +208,7 @@ export default function AddTransaction() {
                     <button
                       type="button"
                       onClick={() => setShowMoreOptions(false)}
-                      className="text-sm text-gray-500 hover:text-gray-700 touch-target"
+                      className="text-sm text-theme-muted hover:text-theme touch-target"
                       aria-label="收起分类与描述"
                     >
                       收起

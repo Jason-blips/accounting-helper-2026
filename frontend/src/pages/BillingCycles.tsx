@@ -97,13 +97,13 @@ export default function BillingCycles() {
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">还款周期</h1>
-          <p className="text-gray-600 text-sm">
+          <h1 className="text-2xl sm:text-3xl font-bold text-theme mb-1">还款周期</h1>
+          <p className="text-theme-muted text-sm">
             按还款日划分周期，查看每期收支并设置预期，合理分配开销
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-theme-muted mt-2">
             还款日、时区等请在
-            <Link to="/settings" className="text-blue-600 hover:underline font-medium ml-1">设置</Link>
+            <Link to="/settings" className="link-theme hover:underline font-medium ml-1">设置</Link>
             中修改
           </p>
         </div>
@@ -111,14 +111,14 @@ export default function BillingCycles() {
         {loadingCycles ? (
           <div className="card p-12 text-center">
             <div className="spinner w-10 h-10 mx-auto border-blue-600"></div>
-            <p className="text-gray-500 mt-3">加载周期...</p>
+            <p className="text-theme-muted mt-3">加载周期...</p>
           </div>
         ) : cycles.length === 0 ? (
           <EmptyState
             title="暂无周期数据"
             description={
               <>
-                请先在<Link to="/settings" className="text-blue-600 hover:underline font-medium">设置</Link>中配置还款日，并确保有交易记录
+                请先在<Link to="/settings" className="link-theme hover:underline font-medium">设置</Link>中配置还款日，并确保有交易记录
               </>
             }
           />
@@ -127,10 +127,10 @@ export default function BillingCycles() {
             {cycles.map((c) => (
               <div
                 key={c.startDate}
-                className="card p-4 sm:p-5 border border-gray-200 hover:border-blue-200 transition-colors"
+                className="card p-4 sm:p-5 border border-theme transition-colors"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                  <h2 className="text-lg font-bold text-gray-900">{cycleLabel(c)}</h2>
+                  <h2 className="text-lg font-bold text-theme">{cycleLabel(c)}</h2>
                   <div className="flex flex-wrap gap-2">
                     <Link
                       to={`/transactions?from=${c.startDate}&to=${c.endDate}`}
@@ -155,30 +155,30 @@ export default function BillingCycles() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                   <div>
-                    <span className="text-gray-500">收入</span>
+                    <span className="text-theme-muted">收入</span>
                     <div className="font-semibold text-green-600">{formatCurrency(c.income, 'GBP')}</div>
-                    <span className="text-gray-400">{c.incomeCount} 笔</span>
+                    <span className="text-theme-muted">{c.incomeCount} 笔</span>
                   </div>
                   <div>
-                    <span className="text-gray-500">支出</span>
+                    <span className="text-theme-muted">支出</span>
                     <div className="font-semibold text-red-600">{formatCurrency(c.expense, 'GBP')}</div>
-                    <span className="text-gray-400">{c.expenseCount} 笔</span>
+                    <span className="text-theme-muted">{c.expenseCount} 笔</span>
                   </div>
                   <div>
-                    <span className="text-gray-500">结余</span>
+                    <span className="text-theme-muted">结余</span>
                     <div className={`font-semibold ${c.balance >= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
                       {formatCurrency(c.balance, 'GBP')}
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-500">预期</span>
+                    <span className="text-theme-muted">预期</span>
                     {(c.expectedIncome != null || c.expectedExpense != null) ? (
-                      <div className="text-amber-700 text-xs">
+                      <div className="text-theme text-xs">
                         {c.expectedIncome != null && `收 ${formatCurrency(c.expectedIncome, 'GBP')} `}
                         {c.expectedExpense != null && `支 ${formatCurrency(c.expectedExpense, 'GBP')}`}
                       </div>
                     ) : (
-                      <span className="text-gray-400">未设置</span>
+                      <span className="text-theme-muted">未设置</span>
                     )}
                   </div>
                 </div>
@@ -194,11 +194,11 @@ export default function BillingCycles() {
           onKeyDown={handleBudgetModalKeyDown}
           role="presentation"
         >
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-labelledby="budget-modal-title">
-            <h3 id="budget-modal-title" className="text-lg font-bold mb-4">设置预期收支 · {cycleLabel(editingBudget)}</h3>
+          <div className="bg-theme-surface rounded-xl shadow-xl max-w-md w-full p-6 border border-theme" role="dialog" aria-modal="true" aria-labelledby="budget-modal-title">
+            <h3 id="budget-modal-title" className="text-lg font-bold text-theme mb-4">设置预期收支 · {cycleLabel(editingBudget)}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget-expected-income">预期收入 (GBP)</label>
+                <label className="block text-sm font-medium text-theme mb-1" htmlFor="budget-expected-income">预期收入 (GBP)</label>
                 <input
                   id="budget-expected-income"
                   ref={budgetModalFirstInputRef}
@@ -212,7 +212,7 @@ export default function BillingCycles() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="budget-expected-expense">预期支出 (GBP)</label>
+                <label className="block text-sm font-medium text-theme mb-1" htmlFor="budget-expected-expense">预期支出 (GBP)</label>
                 <input
                   id="budget-expected-expense"
                   type="number"
