@@ -107,21 +107,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-10 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
-        <div className="card p-8 space-y-8">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4">
-              <span className="text-3xl">💰</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight mb-2">
-              欢迎使用 Tally Drop 落记
-            </h2>
-            <p className="text-base text-indigo-600/80 font-medium">
-              Track your income and expenses—simply.
-            </p>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-3 sm:mb-4">
+            <span className="text-2xl sm:text-3xl">💰</span>
           </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight mb-1">
+            欢迎使用 Tally Drop 落记
+          </h1>
+          <p className="text-sm sm:text-base text-gray-500">
+            Track your income and expenses—simply.
+          </p>
+        </div>
 
+        <div className="card p-6 sm:p-8 space-y-6 sm:space-y-8">
           {loginSuccessPrompt ? (
             <div className="space-y-6">
               <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-4 rounded-lg text-center space-y-3">

@@ -196,6 +196,18 @@
     </div>
 
     <script>
+        // 将动态内容转义后插入，防止 XSS
+        function escapeHtml(str) {
+            if (str == null) return '';
+            var s = String(str);
+            return s
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // 检查LocalStorage
         function checkLocalStorage() {
             const resultDiv = document.getElementById('localStorageResult');
@@ -207,13 +219,13 @@
                 
                 let html = '<div class="info-grid">';
                 html += '<div class="info-card"><div class="label">Token</div><div class="value">' + (token ? '✅ 存在' : '❌ 不存在') + '</div></div>';
-                html += '<div class="info-card"><div class="label">用户角色</div><div class="value">' + (role || '❌ 未设置') + '</div></div>';
+                html += '<div class="info-card"><div class="label">用户角色</div><div class="value">' + escapeHtml(role || '❌ 未设置') + '</div></div>';
                 html += '</div>';
                 
                 if (token && role === 'admin') {
                     html += '<div class="status success">✅ 您已被识别为管理员！应该能看到"用户管理"入口</div>';
                 } else if (token && role !== 'admin') {
-                    html += '<div class="status error">❌ 您未被识别为管理员。当前角色: ' + (role || 'null') + '</div>';
+                    html += '<div class="status error">❌ 您未被识别为管理员。当前角色: ' + escapeHtml(role || 'null') + '</div>';
                 } else if (!token) {
                     html += '<div class="status warning">⚠️ 未登录，请先登录</div>';
                 } else {
@@ -248,20 +260,18 @@
                 
                 const user = await response.json();
                 
-                let html = '<div class="status success">✅ API 调用成功</div>';
-                html += '<pre>' + JSON.stringify(user, null, 2) + '</pre>';
-                
+                let html = '<div class="status success">✅ API 调用成功</div><pre id="api-user-json"></pre>';
                 if (user.role === 'admin') {
                     html += '<div class="status success">✅ 服务器确认您是管理员！</div>';
                     html += '<div class="status info">💡 如果界面仍不显示"用户管理"，请点击"修复权限"按钮</div>';
                 } else {
                     html += '<div class="status error">❌ 服务器显示您不是管理员</div>';
-                    html += '<div class="status warning">当前角色: ' + (user.role || 'null') + '</div>';
+                    html += '<div class="status warning">当前角色: ' + escapeHtml(user.role || 'null') + '</div>';
                 }
-                
                 resultDiv.innerHTML = html;
+                resultDiv.querySelector('#api-user-json').textContent = JSON.stringify(user, null, 2);
             } catch (error) {
-                resultDiv.innerHTML = '<div class="status error">❌ API 调用失败: ' + error.message + '</div>';
+                resultDiv.innerHTML = '<div class="status error">❌ API 调用失败: ' + escapeHtml(error && error.message) + '</div>';
             }
         }
 
@@ -291,7 +301,7 @@
                 
                 if (user.role) {
                     localStorage.setItem('userRole', user.role);
-                    resultDiv.innerHTML = '<div class="status success">✅ 权限已更新！角色: ' + user.role + '</div>';
+                    resultDiv.innerHTML = '<div class="status success">✅ 权限已更新！角色: ' + escapeHtml(user.role) + '</div>';
                     resultDiv.innerHTML += '<div class="status info">💡 请刷新主页面（按F5）查看效果</div>';
                     
                     // 自动刷新检查
@@ -303,7 +313,7 @@
                     resultDiv.innerHTML = '<div class="status error">❌ 用户信息中没有角色字段</div>';
                 }
             } catch (error) {
-                resultDiv.innerHTML = '<div class="status error">❌ 修复失败: ' + error.message + '</div>';
+                resultDiv.innerHTML = '<div class="status error">❌ 修复失败: ' + escapeHtml(error && error.message) + '</div>';
             }
         }
 
@@ -331,7 +341,10 @@
                 url: window.location.href
             };
             
-            resultDiv.innerHTML = '<pre>' + JSON.stringify(details, null, 2) + '</pre>';
+            var pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(details, null, 2);
+            resultDiv.innerHTML = '';
+            resultDiv.appendChild(pre);
         }
 
         // 前往用户管理页面

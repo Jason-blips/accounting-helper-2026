@@ -98,3 +98,76 @@
 | API 错误信息 | 直接返回 `ex.getMessage()` | 生产环境不返回详细异常信息，或先白名单/截断 |
 
 按上述建议自行修改即可在不改变业务逻辑的前提下提升安全性；若你希望某一条落成具体补丁（例如某文件的 diff），可以指定文件与条目，再按你的习惯改。
+
+---
+
+## 五、自查方法（以后你也可以按这套流程自己查）
+
+### 5.1 SQL 注入：怎么查、怎么防
+
+**检查步骤：**
+
+1. **搜“拼进 SQL”的写法**
+   - 在后端代码里搜：`+ "`、`+ '`、`String.format`、`concat`、`"SELECT.*" +`、`"INSERT.*" +` 等，且附近有请求参数、RequestBody、路径变量或用户输入。
+   - 重点文件：所有 `*Repository.java`、`*Service.java`、任何用 `JdbcTemplate`、`EntityManager.createNativeQuery`、`Statement` 的地方。
+   - **危险**：任何把 `request.getXxx()`、`@RequestParam`、`@PathVariable`、表单字段等**直接拼进 SQL 字符串**的，都算潜在 SQL 注入。
+
+2. **确认“安全写法”**
+   - **安全**：SQL 里只有 `?` 占位符，参数用 `jdbcTemplate.update(sql, param1, param2, ...)` 或 `PreparedStatement.setXxx()` 传入。
+   - **安全**：JPA 里 `@Query` 使用 `:paramName` 且参数用 `@Param("paramName")` 绑定，或方法名派生查询（如 `findByUserId`），没有把用户输入拼进 query 字符串。
+   - **安全**：`CriteriaBuilder` / `Specification` 里用 `cb.equal(root.get("field"), value)`、`cb.like(..., pattern)` 等，`value`/`pattern` 来自用户但作为**参数**传入，不是拼进 SQL 字符串。
+
+**防护原则（你自己做时记住）：**
+
+- **一律参数化**：所有 SQL/JPQL 里涉及用户输入的地方，只用占位符（`?` 或 `:name`）并绑定参数，绝不拼接。
+- **输入校验**：对日期做格式白名单（如 `yyyy-MM-dd`），对关键字、分类名等做长度上限（如 200 字符）和字符集限制，再进查询或入库。
+- **权限最小化**：DB 账号只给当前库需要的权限，不给 DBA/跨库权限。
+
+---
+
+### 5.2 XSS：怎么查、怎么防
+
+**检查步骤：**
+
+1. **搜“把数据当 HTML 写进页面”的写法**
+   - 前端搜：`dangerouslySetInnerHTML`、`innerHTML`、`outerHTML`、`document.write`、`insertAdjacentHTML`。
+   - 看赋给这些的**内容来源**：若来自 API 响应、URL 参数、用户输入、`error.message` 等，且没有做转义或白名单，就是潜在 XSS。
+
+2. **区分“是否含用户/接口数据”**
+   - **相对安全**：`innerHTML` 赋值为**写死的常量字符串**（如错误页的“应用加载失败”），没有插任何用户或接口数据。
+   - **有风险**：`innerHTML = ... + user.role + ...`、`innerHTML = ... + error.message + ...`、`innerHTML = JSON.stringify(apiResponse)` 等，一旦数据里带 `<script>` 或 `onerror=` 等，就会执行。
+
+3. **React 默认行为**
+   - 用 `{variable}` 渲染时，React 会转义，**不会**把 `variable` 当 HTML 解析，所以一般安全。
+   - 只有 `dangerouslySetInnerHTML={{ __html: ... }}` 会按 HTML 渲染，需要确保 `...` 要么是可信内容，要么已经过转义/过滤。
+
+**防护原则（你自己做时记住）：**
+
+- **能不用 innerHTML 就不用**：显示纯文本或 JSON 时，用 `textContent` 或 React 的 `{variable}`。
+- **必须用 innerHTML 时**：只插入**自己构造的、不含用户数据的 HTML**，或对用户/接口数据先做 **HTML 转义**（如 `<` → `&lt;`，`>` → `&gt;`，`"` → `&quot;` 等）再插入。
+- **接口错误信息**：生产环境不要直接把异常 `getMessage()` 或堆栈返回给前端；可返回通用文案，详细内容只写日志。
+- **可选**：加响应头 `X-Content-Type-Options: nosniff`；需要时再加 CSP（Content-Security-Policy）限制脚本来源，减轻 XSS 影响。
+
+---
+
+### 5.3 快速检索命令（供你在项目里自己搜）
+
+**Linux / macOS / Git Bash：**
+
+- **SQL 相关**（在后端目录执行）：  
+  `grep -r "createNativeQuery\|createQuery\|JdbcTemplate\|PreparedStatement\|Statement" --include="*.java" .`  
+  然后逐个看是否有字符串拼接 SQL。
+
+- **XSS 相关**（在前端/静态页目录执行）：  
+  `grep -r "innerHTML\|dangerouslySetInnerHTML\|document\.write" --include="*.tsx" --include="*.ts" --include="*.html" .`  
+  然后看赋值右侧是否包含接口数据或用户输入。
+
+**Windows（PowerShell，在项目根或对应目录下执行）：**
+
+- **SQL 相关**（在 `backend-java` 目录下）：  
+  `Get-ChildItem -Recurse -Filter *.java | Select-String "createNativeQuery|createQuery|JdbcTemplate|PreparedStatement|Statement"`
+
+- **XSS 相关**（在 `frontend` 目录下）：  
+  `Get-ChildItem -Path . -Recurse -Include *.tsx,*.ts,*.html | Select-String "innerHTML|dangerouslySetInnerHTML|document\.write"`
+
+按上面“检查步骤 + 防护原则”做一遍，就能系统性地自查 SQL 注入和 XSS，并自己实施防护。
