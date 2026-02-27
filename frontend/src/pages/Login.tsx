@@ -111,17 +111,13 @@ export default function Login() {
       <div className="max-w-md w-full">
         <div className="card p-8 space-y-8">
           <div className="text-center">
-            <p className="text-sm font-medium text-indigo-600 mb-3">欢迎使用 Tally Drop 落记</p>
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4">
               <span className="text-3xl">💰</span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              {isLogin ? '欢迎回来' : '创建账号'}
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight mb-2">
+              欢迎使用 Tally Drop 落记
             </h2>
-            <p className="text-gray-600 mb-1">
-              {isLogin ? '登录您的账户以继续' : '注册新账户开始使用'}
-            </p>
-            <p className="text-sm text-gray-500 italic">
+            <p className="text-base text-indigo-600/80 font-medium">
               Track your income and expenses—simply.
             </p>
           </div>
