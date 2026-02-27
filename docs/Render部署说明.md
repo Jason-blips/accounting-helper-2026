@@ -64,9 +64,8 @@ spring.main.lazy-initialization: ${LAZY_INIT:true}
 
 ## 健康检查接口说明
 
-- **路径**：`GET /api/health`
-- **认证**：无需 token，已在 Security 中放行。
-- **响应**：`200 OK`，body 为 `{"status":"healthy"}`。
+- **`GET /api/health`**：无需 token，返回 `200`，body `{"status":"healthy"}`。建议用作 Render 控制台的 **Health Check Path**（部署就绪检测）。
+- **`GET /api/ping`**：无需 token，返回 `200`，body 纯文本 `ok`，专门用于保活/唤醒；定时请求此接口即可避免免费实例休眠。
 
 确保 Render 的 Health Check Path 为 **`/api/health`**（不要带域名或 `/api` 前缀以外的路径）。
 
@@ -75,3 +74,43 @@ spring.main.lazy-initialization: ${LAZY_INIT:true}
 1. 查看 Render **Logs**：确认是否有 “Tomcat started on port 10000” 和 “Tally Drop 落记 Backend Started!”。
 2. 若端口已启动但仍失败：检查 **Health Check Path** 是否为 `/api/health`，且无多余斜杠或拼写错误。
 3. 若为 Blueprint 部署：可参考项目根目录 `render.yaml` 中的 `healthCheckPath` 配置。
+
+---
+
+## 免费版保活（避免服务休眠）
+
+Render 免费版在约 **15 分钟**无请求后会自动休眠，下次访问需冷启动（约 30 秒～1 分钟）。通过**定时请求**后端可保持服务常驻。
+
+项目已提供两种方式，任选其一即可。
+
+### 方式一：GitHub Actions（推荐，无需常开电脑）
+
+1. 打开仓库 **Settings** → **Secrets and variables** → **Actions**。
+2. 点 **New repository secret**，名称填 **`RENDER_APP_URL`**，值填后端根地址，例如：
+   - `https://your-app-name.onrender.com`  
+   （不要带 `/api` 或末尾斜杠）
+3. 推送代码后，工作流 **Render Keep-Alive** 会按计划每 14 分钟请求一次 `{RENDER_APP_URL}/api/ping`（保活专用接口，返回 `ok`）。
+4. 可在 **Actions** 页手动运行一次 **Render Keep-Alive** 做测试。
+
+工作流文件：`.github/workflows/render-keepalive.yml`。
+
+### 方式二：本地脚本（需本机或服务器常运行）
+
+在项目根目录执行（需 Node 18+）：
+
+```bash
+# 方式 A：环境变量
+set RENDER_APP_URL=https://your-app-name.onrender.com
+node scripts/render-keepalive.js
+
+# 方式 B：命令行参数
+node scripts/render-keepalive.js https://your-app-name.onrender.com
+```
+
+脚本会请求后端的 **`/api/ping`** 接口（返回纯文本 `ok`，无需登录），立即执行一次，之后每 14 分钟一次。可通过环境变量 `KEEPALIVE_INTERVAL_MS` 修改间隔（单位毫秒）。
+
+### 保活原理说明
+
+- 后端已提供 **`GET /api/ping`**：无需登录，请求即返回 `200` 和 body `ok`，专门用于被定时调用。
+- 只要在约 15 分钟内有一次成功请求到达 Render，免费实例就不会休眠；定时请求 `/api/ping` 即可实现“一直被唤醒”。
+- Render 控制台里的 **Health Check Path** 仍建议用 **`/api/health`**（用于部署时的就绪检测）；保活用 **`/api/ping`** 即可。

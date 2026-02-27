@@ -32,10 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // 公开端点：登录、注册、健康检查等无需 token
-        if (path.equals("/api/auth/register") ||
+        // 公开端点：API 根、登录、注册、健康检查等无需 token
+        if (path.equals("/api") || path.equals("/api/") ||
+            path.equals("/api/auth/register") ||
             path.equals("/api/auth/login") ||
             path.equals("/api/health") ||
+            path.equals("/api/ping") ||
             path.equals("/api/currency/convert")) {
             filterChain.doFilter(request, response);
             return;
