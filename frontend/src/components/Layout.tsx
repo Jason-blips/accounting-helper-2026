@@ -138,8 +138,7 @@ export default function Layout({ children }: LayoutProps) {
                 style={{ backgroundImage: 'linear-gradient(to right, var(--theme-primary), var(--theme-primary-hover))' } as React.CSSProperties}
               >
                 <span className="text-xl sm:text-2xl">💰</span>
-                <span className="hidden sm:inline">Tally Drop 落记</span>
-                <span className="sm:hidden">落记</span>
+                <span>Tally Drop 落记</span>
               </Link>
               {/* 桌面端导航 */}
               <div className="hidden md:flex space-x-1">

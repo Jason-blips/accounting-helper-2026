@@ -107,44 +107,65 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-10 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-3 sm:mb-4">
-            <span className="text-2xl sm:text-3xl">💰</span>
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden py-8 sm:py-12 px-4 sm:px-6">
+      {/* 背景：与主题一致的渐变 + 柔和光晕，让卡片有“落点” */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          background: 'linear-gradient(160deg, var(--primary-50) 0%, var(--theme-surface) 45%, var(--theme-bg) 100%)',
+        }}
+      />
+      <div
+        className="absolute top-1/4 -left-1/4 w-[80%] max-w-md h-64 rounded-full opacity-40 -z-10 blur-3xl"
+        style={{ background: 'var(--theme-primary)' }}
+      />
+      <div
+        className="absolute bottom-1/4 -right-1/4 w-[60%] max-w-sm h-48 rounded-full opacity-30 -z-10 blur-3xl"
+        style={{ background: 'var(--theme-primary)' }}
+      />
+
+      <div className="max-w-md w-full page-content">
+        <div className="text-center mb-6 sm:mb-8">
+          <div
+            className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mb-4 shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-hover) 100%)',
+              boxShadow: '0 8px 24px color-mix(in srgb, var(--theme-primary) 30%, transparent)',
+            }}
+          >
+            <span className="text-2xl sm:text-3xl" aria-hidden>💰</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight mb-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-theme tracking-tight mb-1.5">
             欢迎使用 Tally Drop 落记
           </h1>
-          <p className="text-sm sm:text-base text-gray-500">
+          <p className="text-sm sm:text-base text-theme-muted">
             Track your income and expenses—simply.
           </p>
         </div>
 
-        <div className="card p-6 sm:p-8 space-y-6 sm:space-y-8">
+        <div className="card card-flat p-6 sm:p-8 space-y-6 sm:space-y-8">
           {loginSuccessPrompt ? (
-            <div className="space-y-6">
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-4 rounded-lg text-center space-y-3">
-                <div className="flex justify-center">
-                  <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="font-semibold text-lg">登录成功</p>
-                <p className="text-sm text-green-700">
-                  您可在浏览器弹窗中选择「保存密码」，便于下次登录；也可使用密码管理器保存。
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginSuccessPrompt(false);
-                    navigate('/');
-                  }}
-                  className="btn-primary mt-2"
-                >
-                  进入主界面
-                </button>
+            <div className="text-center space-y-4">
+              <div
+                className="inline-flex items-center justify-center w-12 h-12 rounded-full"
+                style={{ backgroundColor: 'var(--theme-primary-soft)' }}
+              >
+                <svg className="w-6 h-6" style={{ color: 'var(--theme-primary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
+              <p className="font-semibold text-theme text-lg">登录成功</p>
+              <p className="text-sm text-theme-muted">可保存到浏览器或密码管理器，便于下次登录</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginSuccessPrompt(false);
+                  navigate('/');
+                }}
+                className="btn-primary w-full sm:w-auto"
+              >
+                进入主界面
+              </button>
             </div>
           ) : (
           <form
@@ -155,11 +176,14 @@ export default function Login() {
             aria-label={isLogin ? '登录' : '注册'}
           >
             {registerSuccess && (
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center space-x-2">
+              <div
+                className="rounded-xl px-4 py-3 flex items-center gap-2 text-sm font-medium"
+                style={{ backgroundColor: 'var(--theme-primary-soft)', color: 'var(--theme-primary)' }}
+              >
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="font-medium">{registerSuccess}</span>
+                <span>{registerSuccess}</span>
               </div>
             )}
             {error && <ErrorBanner message={error} />}
@@ -181,12 +205,6 @@ export default function Login() {
               </div>
               <div>
                 <label className="label" htmlFor="login-password">密码</label>
-                {!isLogin && (
-                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2 flex items-center gap-2">
-                    <span aria-hidden className="text-amber-600">🔐</span>
-                    <span>推荐使用强密码（含大小写、数字、符号），可一键生成并保存到密码管理器</span>
-                  </p>
-                )}
                 <div className="flex gap-2 flex-wrap">
                   <input
                     id="login-password"
@@ -195,7 +213,7 @@ export default function Login() {
                     required
                     autoComplete={isLogin ? 'current-password' : 'new-password'}
                     className="input-field flex-1 min-w-0"
-                    placeholder={isLogin ? '请输入密码' : '请设置密码（可点击右侧生成推荐密码）'}
+                    placeholder={isLogin ? '请输入密码' : '请设置密码'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -203,23 +221,18 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={handleUseRecommendedPassword}
-                      className="btn-secondary whitespace-nowrap px-4 shrink-0"
-                      title="生成并填充推荐强密码，并复制到剪贴板"
-                      aria-label="生成并填充推荐强密码，并复制到剪贴板"
+                      className="btn-secondary whitespace-nowrap px-3 sm:px-4 shrink-0 text-sm"
+                      title="生成强密码并复制"
+                      aria-label="生成强密码并复制"
                     >
-                      {passwordCopied ? '✓ 已复制' : '生成推荐密码'}
+                      {passwordCopied ? '✓' : '生成'}
                     </button>
                   )}
                 </div>
-                {!isLogin && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    生成后可保存到浏览器或密码管理器中，下次登录更方便
-                  </p>
-                )}
               </div>
               {!isLogin && (
                 <div>
-                  <label className="label" htmlFor="login-email">邮箱（可选）</label>
+                  <label className="label" htmlFor="login-email">邮箱（选填）</label>
                   <input
                     id="login-email"
                     type="email"
@@ -242,8 +255,8 @@ export default function Login() {
               >
                 {loading ? (
                   <>
-                    <div className="spinner w-4 h-4"></div>
-                    <span>处理中...</span>
+                    <div className="spinner w-4 h-4" aria-hidden />
+                    <span>{isLogin ? '登录中...' : '注册中...'}</span>
                   </>
                 ) : (
                   <>
@@ -256,7 +269,7 @@ export default function Login() {
               </button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center pt-4 mt-2 border-t border-theme">
               <button
                 type="button"
                 onClick={() => {
@@ -264,7 +277,7 @@ export default function Login() {
                   setError('');
                   setRegisterSuccess('');
                 }}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                className="text-sm font-medium link-theme py-2 px-3 rounded-xl hover:bg-theme-surface-hover transition-colors duration-200"
               >
                 {isLogin ? '没有账号？点击注册' : '已有账号？点击登录'}
               </button>

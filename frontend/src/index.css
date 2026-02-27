@@ -110,6 +110,11 @@
     background-color: var(--theme-surface-hover);
     box-shadow: var(--shadow-card-hover);
   }
+  /* 表单等静态卡片：悬停不浮起、不变色 */
+  .card-flat:hover {
+    background-color: var(--theme-surface);
+    box-shadow: var(--shadow-card);
+  }
 
   .card-hover {
     transition: box-shadow 0.3s var(--ease-out), transform 0.3s var(--ease-out);
